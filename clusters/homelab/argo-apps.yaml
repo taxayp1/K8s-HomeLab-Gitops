@@ -16,3 +16,24 @@ spec:
     automated:
       prune: false
       selfHeal: false
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: cluster-infrastructure
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: 'https://github.com/taxayp1/k8s-homelab-gitops-.git'
+    targetRevision: HEAD
+    path: infrastructure
+    directory:
+      recurse: true    # This looks into all subfolders automatically
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: false
+      selfHeal: false
