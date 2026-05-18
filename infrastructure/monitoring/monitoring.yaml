@@ -1,0 +1,40 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kube-prometheus-stack
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://prometheus-community.github.io/helm-charts
+    chart: kube-prometheus-stack
+    targetRevision: 85.1.1
+    helm:
+      values: |
+       USER-SUPPLIED VALUES:
+grafana:
+  additionalDataSources:
+  - access: proxy
+    jsonData:
+      maxLines: 1000
+    name: Loki
+    type: loki
+    url: http://loki-gateway.logging.svc.cluster.local
+prometheus:
+  prometheusSpec:
+    resources:
+      limits:
+        memory: 800Mi
+      requests:
+        memory: 400Mi
+    retention: 2d
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          resources:
+            requests:
+              storage: 10Gi
+          storageClassName: longhorn
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring
