@@ -6,10 +6,12 @@ metadata:
 spec:
   project: default
   source:
-    # Use the official Helm repository instead of GitHub
-    repoURL: https://rancher.github.io/local-path-provisioner/
-    chart: local-path-provisioner
-    targetRevision: 0.0.30 # Use a stable version
+    # 1. Point to the ACTUAL GitHub Repo
+    repoURL: https://github.com/rancher/local-path-provisioner.git
+    # 2. Use 'master' (This is the branch Rancher uses)
+    targetRevision: master
+    # 3. Path to where the Chart.yaml lives in their repo
+    path: deploy/chart/local-path-provisioner
     helm:
       values: |
         storageClass:
@@ -26,5 +28,3 @@ spec:
     automated:
       prune: true
       selfHeal: true
-    syncOptions:
-      - CreateNamespace=true # Tells Argo to create the namespace if it's missing
