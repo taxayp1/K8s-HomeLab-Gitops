@@ -13,13 +13,12 @@ spec:
       values: |
         persistence:
           defaultClass: true
-          USER-SUPPLIED VALUES:
-defaultSettings:
-  defaultDataPath: /mnt/longhorn-storage
-  defaultReplicaCount: 3
-  guaranteedEngineManagerCPU: 0
-  guaranteedReplicaManagerCPU: 0
-  replicaSoftAntiAffinity: true
+        defaultSettings:
+          defaultDataPath: /mnt/longhorn-storage
+          defaultReplicaCount: 3
+          guaranteedEngineManagerCPU: 0
+          guaranteedReplicaManagerCPU: 0
+          replicaSoftAntiAffinity: true
   destination:
     server: https://kubernetes.default.svc
     namespace: longhorn-system
