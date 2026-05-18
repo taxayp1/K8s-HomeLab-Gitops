@@ -11,20 +11,17 @@ spec:
     targetRevision: 9.5.14
     helm:
       values: |
-USER-SUPPLIED VALUES:
-applicationSet:
-  replicas: 1
-controller:
-  replicas: 1
-global:
-  logging:
-    level: info
-notifications:
-  enabled: false
-repoServer:
-  replicas: 1
-server:
-  replicas: 1
+        configs:
+          params:
+            server.insecure: true
+        controller:
+          replicas: 1
+        server:
+          replicas: 1
+        repoServer:
+          replicas: 1
+        applicationSet:
+          replicas: 1
   destination:
     server: https://kubernetes.default.svc
     namespace: argocd
