@@ -6,14 +6,15 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/rancher/local-path-provisioner.git
-    targetRevision: master
-    path: deploy/chart/local-path-provisioner
+    # Use the official Helm repository instead of GitHub
+    repoURL: https://rancher.github.io/local-path-provisioner/
+    chart: local-path-provisioner
+    targetRevision: 0.0.30 # Use a stable version
     helm:
       values: |
         storageClass:
-          defaultClass: false
           name: local-path
+          defaultClass: false
         nodePathMap:
           - node: DEFAULT_PATH_FOR_NON_LISTED_NODES
             paths:
@@ -21,3 +22,9 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: local-path-storage
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true # Tells Argo to create the namespace if it's missing
