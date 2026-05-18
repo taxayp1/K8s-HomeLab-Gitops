@@ -1,0 +1,30 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: argocd-self-managed
+  namespace: argocd
+spec:
+  project: default
+  source:
+    chart: argo-cd
+    repoURL: https://argoproj.github.io/argo-helm
+    targetRevision: 9.5.14
+    helm:
+      values: |
+USER-SUPPLIED VALUES:
+applicationSet:
+  replicas: 1
+controller:
+  replicas: 1
+global:
+  logging:
+    level: info
+notifications:
+  enabled: false
+repoServer:
+  replicas: 1
+server:
+  replicas: 1
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
