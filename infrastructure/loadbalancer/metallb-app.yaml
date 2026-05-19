@@ -12,6 +12,10 @@ spec:
     helm:
       values: |
         fullnameOverride: "metallb"
+        controller:
+          name: "controller"
+        speaker:
+          name: "speaker"
   destination:
     server: https://kubernetes.default.svc
     namespace: metallb-system
