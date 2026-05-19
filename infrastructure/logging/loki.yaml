@@ -8,12 +8,26 @@ spec:
   source:
     repoURL: https://grafana.github.io/helm-charts
     chart: loki
-    targetRevision: 6.6.0
+    targetRevision: 7.0.0  # Matches your exact manual deployment chart version
     helm:
       values: |
         fullnameOverride: "loki"
         
-        # This fixes the missing storage properties that caused the nil pointer crash
+        # This matches your app.kubernetes.io/component=single-binary deployment layout
+        deploymentMode: SingleBinary
+        
+        singleBinary:
+          replicas: 1
+          # Enforce memory limits on your main engine container to save your node RAM pools
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+
+        # Explicitly configure the storage type to filesystem so the 7.0.0 templates compile
         loki:
           auth_enabled: false
           commonConfig:
@@ -26,43 +40,12 @@ spec:
               chunks: chunks
               ruler: ruler
               admin: admin
-          
-          # Clamp down on the primary engine memory pool 
-          singleBinary:
-            resources:
-              requests:
-                cpu: 100m
-                memory: 256Mi
-              limits:
-                cpu: 500m
-                memory: 512Mi
 
-        # Explicitly configure the deployment model to safely match your standalone specs
-        deploymentMode: SingleBinary
-        singleBinary:
-          replicas: 1
-        backend:
-          replicas: 0
-        read:
-          replicas: 0
-        write:
-          replicas: 0
-
-        # Enforce memory limits across the caches to protect SFF cluster RAM limits
+        # Disable caching deployments if you aren't using external memcached pools
         chunksCache:
-          enabled: true
-          resources:
-            requests:
-              memory: 128Mi
-            limits:
-              memory: 256Mi
+          enabled: false
         resultsCache:
-          enabled: true
-          resources:
-            requests:
-              memory: 128Mi
-            limits:
-              memory: 256Mi
+          enabled: false
   destination:
     server: https://kubernetes.default.svc
     namespace: logging
