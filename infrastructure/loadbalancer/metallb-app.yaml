@@ -8,14 +8,10 @@ spec:
   source:
     chart: metallb
     repoURL: https://metallb.github.io/metallb
-    targetRevision: 0.14.5 
+    targetRevision: 0.14.5
     helm:
       values: |
-        fullnameOverride: "metallb"
-        controller:
-          name: "controller"
-        speaker:
-          name: "speaker"
+        fullnameOverride: "metallb" 
   destination:
     server: https://kubernetes.default.svc
     namespace: metallb-system
@@ -23,3 +19,5 @@ spec:
     automated:
       prune: true
       selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
