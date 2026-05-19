@@ -6,11 +6,8 @@ metadata:
 spec:
   project: default
   source:
-    # 1. Point to the ACTUAL GitHub Repo
     repoURL: https://github.com/rancher/local-path-provisioner.git
-    # 2. Use 'master' (This is the branch Rancher uses)
     targetRevision: master
-    # 3. Path to where the Chart.yaml lives in their repo
     path: deploy/chart/local-path-provisioner
     helm:
       values: |
