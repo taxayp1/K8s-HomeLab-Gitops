@@ -8,17 +8,32 @@ spec:
   source:
     repoURL: https://grafana.github.io/helm-charts
     chart: loki
-    targetRevision: 7.0.0  # Matches your exact manual deployment chart version
+    targetRevision: 7.0.0  # Matches your exact running chart version
     helm:
       values: |
         fullnameOverride: "loki"
         
-        # This matches your app.kubernetes.io/component=single-binary deployment layout
+        # 1. Force the exact Single Binary mode matching your running pod layout
         deploymentMode: SingleBinary
         
         singleBinary:
           replicas: 1
-          # Enforce memory limits on your main engine container to save your node RAM pools
+          # Mounts your EXACT existing 10Gi Longhorn PVC storage volume configuration
+          persistence:
+            enabled: true
+            size: 10Gi
+            storageClass: longhorn
+            # Matching the volume name prefix patterns for loki statefulsets
+            volumeClaimsTemplates:
+              - metadata:
+                  name: storage
+                spec:
+                  accessModes:
+                    - RWO
+                  resources:
+                    requests:
+                      storage: 10Gi
+                  storageClassName: longhorn
           resources:
             requests:
               cpu: 100m
@@ -27,7 +42,15 @@ spec:
               cpu: 500m
               memory: 512Mi
 
-        # Explicitly configure the storage type to filesystem so the 7.0.0 templates compile
+        # 2. CRITICAL: Completely disable distributed targets to pass the v7 validation error
+        backend:
+          replicas: 0
+        read:
+          replicas: 0
+        write:
+          replicas: 0
+        
+        # 3. Explicitly declare simple filesystem storage rules over your mounted volume
         loki:
           auth_enabled: false
           commonConfig:
@@ -41,7 +64,7 @@ spec:
               ruler: ruler
               admin: admin
 
-        # Disable caching deployments if you aren't using external memcached pools
+        # Turn off the multi-pod microservice cache layers
         chunksCache:
           enabled: false
         resultsCache:
