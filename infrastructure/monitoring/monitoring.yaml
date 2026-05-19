@@ -19,8 +19,15 @@ spec:
     helm:
       values: |
         grafana:
+          resources:
+            requests:
+              memory: 150Mi
+              cpu: 100m
+            limits:
+              memory: 512Mi
+              cpu: 500m
           admin:
-            existingSecret: "grafana-admin-credentials"
+            existingSecret: grafana-admin-credentials
             userKey: admin-user
             passwordKey: admin-password
           additionalDataSources:
