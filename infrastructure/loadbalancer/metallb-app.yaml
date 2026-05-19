@@ -22,3 +22,12 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - SkipDryRunOnMissingResource=true
+ignoreDifferences:
+    - group: metallb.io
+      kind: BGPPeer
+      jsonPointers:
+        - /
+    - group: metallb.io
+      kind: BGPAdvertisement
+      jsonPointers:
+        - /
