@@ -12,31 +12,52 @@ spec:
     helm:
       values: |
         fullnameOverride: "loki"
+        
+        # This fixes the missing storage properties that caused the nil pointer crash
+        loki:
+          auth_enabled: false
+          commonConfig:
+            replication_factor: 1
+          storage:
+            type: filesystem
+            local:
+              directory: /var/loki/chunks
+            bucketNames:
+              chunks: chunks
+              ruler: ruler
+              admin: admin
+          
+          # Clamp down on the primary engine memory pool 
+          singleBinary:
+            resources:
+              requests:
+                cpu: 100m
+                memory: 256Mi
+              limits:
+                cpu: 500m
+                memory: 512Mi
+
+        # Explicitly configure the deployment model to safely match your standalone specs
         deploymentMode: SingleBinary
+        singleBinary:
+          replicas: 1
         backend:
           replicas: 0
         read:
           replicas: 0
         write:
           replicas: 0
-        singleBinary:
-          replicas: 1
-          resources:
-            requests:
-              cpu: 100m
-              memory: 256Mi
-            limits:
-              cpu: 500m
-              memory: 512Mi
+
+        # Enforce memory limits across the caches to protect SFF cluster RAM limits
         chunksCache:
-          allocatedMemory: 2048
+          enabled: true
           resources:
             requests:
               memory: 128Mi
             limits:
               memory: 256Mi
         resultsCache:
-          allocatedMemory: 2048
+          enabled: true
           resources:
             requests:
               memory: 128Mi
