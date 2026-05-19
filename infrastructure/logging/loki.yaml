@@ -12,7 +12,7 @@ spec:
     helm:
       values: |
         fullnameOverride: "loki"
-        deploymentMode: SimpleScalable
+        deploymentMode: SingleBinary
         backend:
           replicas: 0
         read:
