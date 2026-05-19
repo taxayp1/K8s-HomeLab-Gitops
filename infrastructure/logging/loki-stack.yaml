@@ -1,20 +1,26 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: loki-stack
+  name: loki
   namespace: argocd
 spec:
   project: default
   source:
     repoURL: https://grafana.github.io/helm-charts
-    chart: loki-stack
-    targetRevision: 2.10.2  # Standard stable target version for the combined stack
+    chart: loki
+    targetRevision: 6.6.0
     helm:
       values: |
-        loki:
-          enabled: true
-          fullnameOverride: "loki"
-          # Memory limits to save your SFF node RAM pools
+        fullnameOverride: "loki"
+        deploymentMode: SimpleScalable
+        backend:
+          replicas: 0
+        read:
+          replicas: 0
+        write:
+          replicas: 0
+        singleBinary:
+          replicas: 1
           resources:
             requests:
               cpu: 100m
@@ -22,36 +28,27 @@ spec:
             limits:
               cpu: 500m
               memory: 512Mi
-          chunksCache:
-            resources:
-              requests:
-                memory: 128Mi
-              limits:
-                memory: 256Mi
-          resultsCache:
-            resources:
-              requests:
-                memory: 128Mi
-              limits:
-                memory: 256Mi
-
-        promtail:
-          enabled: true
-          fullnameOverride: "promtail"
-          # Tiny limits because promtail just streams text logs to loki
+        chunksCache:
+          allocatedMemory: 2048
           resources:
             requests:
-              cpu: 50m
-              memory: 64Mi
-            limits:
-              cpu: 200m
               memory: 128Mi
+            limits:
+              memory: 256Mi
+        resultsCache:
+          allocatedMemory: 2048
+          resources:
+            requests:
+              memory: 128Mi
+            limits:
+              memory: 256Mi
   destination:
     server: https://kubernetes.default.svc
     namespace: logging
   syncPolicy:
     automated:
-      prune: false      # KEEP FALSE FOR THE FIRST SYNC
+      prune: true
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - ServerSideApply=true
