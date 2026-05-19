@@ -22,4 +22,4 @@ spec:
     syncOptions:
       - CreateNamespace=true
       - SkipDryRunOnMissingResource=true
-      - SkipAuthorizeAsAppInCRD=true
+      - TrackingMethod=annotation
