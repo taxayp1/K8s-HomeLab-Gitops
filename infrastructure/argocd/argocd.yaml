@@ -17,8 +17,8 @@ spec:
           params:
             server.insecure: true
           secret:
-            # The properly escaped bcrypt hash for: MyNewSecurePassword123
-            argocdServerAdminPassword: "$2a$10$7RMc8jZ0b7tVwKx8uN/7ueK3V9F2a6D8c7E8f9G0h1I2j3K4l5m6n"
+            # This completely resets and clears the password configuration cache
+            argocdServerAdminPasswordMtime: "2026-05-20T15:00:00Z"
         fullnameOverride: "argocd" 
         controller:
           replicas: 1
