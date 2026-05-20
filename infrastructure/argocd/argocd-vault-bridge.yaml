@@ -1,14 +1,3 @@
-apiVersion: generators.external-secrets.io/v1alpha1
-kind: Password
-metadata:
-  name: argocd-bcrypt-generator
-  namespace: argocd
-spec:
-  # This tells the operator to convert your plain text into a secure bcrypt string
-  length: 24
-
----
-
 apiVersion: external-secrets.io/v1
 kind: SecretStore
 metadata:
