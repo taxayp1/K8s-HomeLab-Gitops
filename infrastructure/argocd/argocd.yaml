@@ -16,9 +16,6 @@ spec:
         configs:
           params:
             server.insecure: true
-          secret:
-            # This completely resets and clears the password configuration cache
-            argocdServerAdminPasswordMtime: "2026-05-20T15:00:00Z"
         fullnameOverride: "argocd" 
         controller:
           replicas: 1
