@@ -13,14 +13,13 @@ spec:
     targetRevision: 9.5.14
     helm:
       values: |
+        helm:
+      values: |
         configs:
           params:
             server.insecure: true
-          argocdSecret:
-            argocd-admin-credentials:
-              enabled: true
-              existingSecretName: "argocd-admin-credentials"
-        # We ensure the names match your ORIGINAL install
+          secret:
+            argocdServerAdminPassword: "MyNewSecurePassword123"
         fullnameOverride: "argocd" 
         controller:
           replicas: 1
