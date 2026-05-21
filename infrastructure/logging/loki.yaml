@@ -13,8 +13,8 @@ spec:
       values: |
         fullnameOverride: "loki"
         deploymentMode: SingleBinary
-        
-        # --- 1. RUNNING THE POD & SETTING RAM LIMITS ---
+
+        # --- 1. RUNNING THE SINGLE BINARY POD & MEMORY SETTINGS ---
         singleBinary:
           replicas: 1
           resources:
@@ -24,36 +24,28 @@ spec:
             limits:
               cpu: 500m
               memory: 512Mi
-          
-          # --- 2. CONNECTING TO YOUR LONGHORN STORAGE ---
           persistence:
             enabled: true
             size: 10Gi
             storageClass: longhorn
-            volumeClaimsTemplates:
-              - metadata:
-                  name: storage
-                spec:
-                  accessModes:
-                    - RWO
-                  resources:
-                    requests:
-                      storage: 10Gi
-                  storageClassName: longhorn
 
-        # Disable distributed scaling pods we don't need
-        backend:
-          replicas: 0
-        read:
-          replicas: 0
-        write:
-          replicas: 0
-        chunksCache:
+        # --- 2. COMPLETELY STRIP EXTENDED ENTERPRISE CACHES ---
+        memcached:
+          chunks:
+            enabled: false
+          results:
+            enabled: false
+        
+        gateway:
           enabled: false
+
         resultsCache:
           enabled: false
-        
-        # --- 3. LOG STORAGE MANAGEMENT & 2-DAY RETENTION ---
+
+        chunksCache:
+          enabled: false
+
+        # --- 3. STORAGE & RETENTION CORE ENGINE CONFIG ---
         loki:
           auth_enabled: false
           commonConfig:
@@ -62,10 +54,6 @@ spec:
             type: filesystem
             local:
               directory: /var/loki/chunks
-            bucketNames:
-              chunks: chunks
-              ruler: ruler
-              admin: admin
           schemaConfig:
             configs:
               - from: "2024-01-01"
@@ -77,11 +65,12 @@ spec:
                   period: 24h
           limits_config:
             retention_period: 48h
+            max_cache_freshness_per_query: 0s
           compactor:
             working_directory: /var/loki/retention
             retention_enabled: true
             retention_delete_delay: 2h
-            retention_delete_worker_count: 150
+            retention_delete_worker_count: 50
             delete_request_store: filesystem
   destination:
     server: https://kubernetes.default.svc
