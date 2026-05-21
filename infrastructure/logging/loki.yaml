@@ -13,8 +13,12 @@ spec:
       values: |
         fullnameOverride: "loki"
         deploymentMode: SingleBinary
-
-        # --- 1. RUNNING THE SINGLE BINARY POD & MEMORY SETTINGS ---
+        backend:
+          replicas: 0
+        read:
+          replicas: 0
+        write:
+          replicas: 0
         singleBinary:
           replicas: 1
           resources:
@@ -28,8 +32,6 @@ spec:
             enabled: true
             size: 10Gi
             storageClass: longhorn
-
-        # --- 2. COMPLETELY STRIP EXTENDED ENTERPRISE CACHES ---
         memcached:
           chunks:
             enabled: false
