@@ -28,6 +28,13 @@ spec:
   target:
     name: argocd-secret # Directly targets the core Argo CD secret
     creationPolicy: "Merge" # Merges values so it doesn't drop server.secretkey
+    template:
+      metadata:
+        annotations:
+          # Tells ArgoCD to completely skip comparing this generated resource
+          argocd.argoproj.io/compare-options: IgnoreExtraneous
+          # Prevents ArgoCD from trying to prune or delete the secret automatically
+          argocd.argoproj.io/sync-options: Prune=false
   data:
     - secretKey: "admin.password"
       remoteRef:
