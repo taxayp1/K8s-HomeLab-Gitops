@@ -7,7 +7,7 @@ This repository drives the declarative, GitOps-controlled application delivery p
 Repository Map & Architecture Blueprint
 
 The `infrastructure/` directory separates core system platform layers from stateless application spaces, following cloud-native organizational standards.
-
+--------------------------------------------------------------------------------------------------------------
 infrastructure/
 ├── argocd/         # The Continuous Delivery Engine (Manages itself via GitOps)
 ├── ingress/        # External Routing Layer (Ingress-NGINX)
