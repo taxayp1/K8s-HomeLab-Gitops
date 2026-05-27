@@ -1,0 +1,38 @@
+apiVersion: longhorn.io/v1beta2
+kind: Node
+metadata:
+  name: wk-01
+  namespace: longhorn-system
+spec:
+  allowScheduling: true
+  disks:
+    default-disk-e0dd26522d9d81c6: 
+      path: /mnt/longhorn-nvme
+      allowScheduling: true
+      storageReserved: 31562232217
+---
+apiVersion: longhorn.io/v1beta2
+kind: Node
+metadata:
+  name: wk-02
+  namespace: longhorn-system
+spec:
+  allowScheduling: true
+  disks:
+    default-disk-7651f695d9ae6268: 
+      path: /mnt/longhorn-nvme
+      allowScheduling: true
+      storageReserved: 31562232217
+---
+apiVersion: longhorn.io/v1beta2
+kind: Node
+metadata:
+  name: wk-03
+  namespace: longhorn-system
+spec:
+  allowScheduling: true
+  disks:
+    default-disk-aeca514aa1dc601e: 
+      path: /mnt/longhorn-nvme
+      allowScheduling: true
+      storageReserved: 31562232217
