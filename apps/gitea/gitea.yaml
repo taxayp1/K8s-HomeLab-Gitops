@@ -8,55 +8,47 @@ spec:
   source:
     repoURL: https://dl.gitea.com/charts/
     chart: gitea
-    targetRevision: 10.2.0 
+    targetRevision: 10.2.0
     helm:
       values: |
+        # 1. Turn off ALL chart-injected sub-databases completely
+        postgresql-ha:
+          enabled: false
+        postgresql:
+          enabled: false
+        redis-cluster:
+          enabled: false
+
+        # 2. Configure Gitea to look at our custom lightweight Postgres deployment below
         gitea:
           config:
             APP_NAME: "Patel Homelab Git Core"
             RUN_MODE: prod
+            database:
+              DB_TYPE: postgres
+              HOST: "gitea-postgres-service:5432"
+              NAME: "gitea"
+              USER: "gitea"
           admin:
             username: taxayp
-            existingSecret: gitea-db-secrets
-            passwordKey: admin-password
-        
-        postgresql-ha:
-          enabled: false
+            password:
+              valueFrom:
+                secretKeyRef:
+                  name: gitea-db-secrets
+                  key: admin-password
 
-        # Switch back to the Bitnami engine layout via a stable public mirror
-        postgresql:
-          enabled: true
-          image:
-            registry: gcr.io
-            repository: bitnami-containers/postgresql
-            tag: 16.3.0-debian-12-r10
-          global:
-            postgresql:
-              auth:
-                username: gitea
-                database: gitea
-                existingSecret: gitea-db-secrets
-                secretKeys:
-                  userPasswordKey: db-password
-                  adminPasswordKey: db-password
-          primary:
-            persistence:
-              enabled: true
-              storageClass: "longhorn"
-              size: 5Gi
-            extraVolumes:
-              - name: postgres-run
-                emptyDir: {}
-            extraVolumeMounts:
-              - name: postgres-run
-                mountPath: /var/run/postgresql
-
-        redis-cluster:
-          enabled: false
-            
+        # 3. Storage for Gitea's repositories
         persistence:
           enabled: true
           storageClass: "longhorn"
           size: 15Gi
           accessModes:
             - ReadWriteOnce
+
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: gitea
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gitea-postgres
+  namespace: gitea
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gitea-postgres
+  template:
+    metadata:
+      matchLabels:
+        app: gitea-postgres
+    spec:
+      containers:
+        - name: postgres
+          image: docker.io/library/postgres:16.3
+          env:
+            - name: POSTGRES_DB
+              value: "gitea"
+            - name: POSTGRES_USER
+              value: "gitea"
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: gitea-db-secrets
+                  key: db-password
+          ports:
+            - containerPort: 5432
+              name: postgres
+          volumeMounts:
+            - name: pgdata
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: pgdata
+          persistentVolumeClaim:
+            claimName: data-gitea-postgresql-0  # Reuses your existing Longhorn PVC data dynamically!
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gitea-postgres-service
+  namespace: gitea
+spec:
+  ports:
+    - port: 5432
+      targetPort: 5432
+  selector:
+    app: gitea-postgres
