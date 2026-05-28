@@ -24,8 +24,8 @@ spec:
             usernameKey: username
             passwordKey: password
 
-        # YOUR FIX: Native Gitea Environment Variables mapping
-        env:
+       
+          env:
           - name: GITEA__database__DB_TYPE
             value: "postgres"
           - name: GITEA__database__HOST
