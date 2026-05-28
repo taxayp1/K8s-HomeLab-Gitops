@@ -13,7 +13,7 @@ spec:
       values: |
         gitea:
           config:
-            APP_NAME: "Patel Homelab Git Core"
+            APP_NAME: "Taxay's Homelab Git Core"
             RUN_MODE: prod
           admin:
             username: taxayp
