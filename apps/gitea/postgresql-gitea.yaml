@@ -11,6 +11,18 @@ spec:
     requests:
       storage: 5Gi
 ---
+apiVersion: v1
+kind: Service
+metadata:
+  name: gitea-postgres-service
+  namespace: gitea
+spec:
+  ports:
+    - port: 5432
+      targetPort: 5432
+  selector:
+    app: gitea-postgres
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -23,7 +35,7 @@ spec:
       app: gitea-postgres
   template:
     metadata:
-      matchLabels:
+      labels:
         app: gitea-postgres
     spec:
       containers:
@@ -34,6 +46,9 @@ spec:
               value: "gitea"
             - name: POSTGRES_USER
               value: "gitea"
+            # Crucial: Instructs Postgres to initialize in a clean subfolder away from lost+found
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
             - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -49,15 +64,3 @@ spec:
         - name: pgdata
           persistentVolumeClaim:
             claimName: gitea-postgres-pvc
----
-apiVersion: v1
-kind: Service
-metadata:
-  name: gitea-postgres-service
-  namespace: gitea
-spec:
-  ports:
-    - port: 5432
-      targetPort: 5432
-  selector:
-    app: gitea-postgres
