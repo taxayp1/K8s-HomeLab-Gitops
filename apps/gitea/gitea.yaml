@@ -34,7 +34,7 @@ spec:
                     key: db-password
           admin:
             existingSecret: gitea-db-secrets
-            # Pulls both strings cleanly from your Vault secret values mapping
+            username: ""
             usernameKey: admin-username
             passwordKey: admin-password
 
