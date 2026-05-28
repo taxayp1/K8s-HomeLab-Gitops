@@ -13,55 +13,44 @@ spec:
       values: |
         gitea:
           config:
-            APP_NAME: "Taxay's Homelab Git Core"
+            APP_NAME: "Patel Homelab Git Core"
             RUN_MODE: prod
           admin:
             username: taxayp
             existingSecret: gitea-db-secrets
             passwordKey: admin-password
         
-        # Database Configuration (PostgreSQL StatefulSet)
         postgresql-ha:
           enabled: false
 
+        # Switch back to the Bitnami engine layout via a stable public mirror
         postgresql:
           enabled: true
           image:
-            registry: docker.io
-            repository: library/postgres
-            tag: "16.3"
+            registry: gcr.io
+            repository: bitnami-containers/postgresql
+            tag: 16.3.0-debian-12-r10
+          global:
+            postgresql:
+              auth:
+                username: gitea
+                database: gitea
+                existingSecret: gitea-db-secrets
+                secretKeys:
+                  userPasswordKey: db-password
+                  adminPasswordKey: db-password
           primary:
-            extraEnvVars:
-              - name: POSTGRES_USER
-                value: "gitea"
-              - name: POSTGRES_DB
-                value: "gitea"
-              - name: POSTGRES_PASSWORD
-                valueFrom:
-                  secretKeyRef:
-                    name: gitea-db-secrets
-                    key: db-password
             persistence:
               enabled: true
               storageClass: "longhorn"
               size: 5Gi
 
         redis-cluster:
-          enabled: false       
-
-        # Raw Git Repository Storage
+          enabled: false
+            
         persistence:
           enabled: true
           storageClass: "longhorn"
           size: 15Gi
           accessModes:
             - ReadWriteOnce
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: gitea
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-    syncOptions:
-      - CreateNamespace=true
