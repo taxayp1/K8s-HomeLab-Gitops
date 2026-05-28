@@ -22,6 +22,9 @@ spec:
             passwordKey: admin-password
         
         # Database Configuration (PostgreSQL StatefulSet)
+        postgresql-ha:
+          enabled: false
+          
         postgresql:
           enabled: true
           global:
