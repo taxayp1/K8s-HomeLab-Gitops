@@ -21,22 +21,20 @@ metadata:
   name: argocd-secret-sync
   namespace: argocd
 spec:
-  refreshInterval: "1m" # Checks Vault every minute for changes
+  refreshInterval: "1m" 
   secretStoreRef:
     name: vault-backend
     kind: SecretStore
   target:
-    name: argocd-secret # Directly targets the core Argo CD secret
-    creationPolicy: "Merge" # Merges values so it doesn't drop server.secretkey
+    name: argocd-secret
+    creationPolicy: "Merge"
     template:
       metadata:
         annotations:
-          # Tells ArgoCD to completely skip comparing this generated resource
           argocd.argoproj.io/compare-options: IgnoreExtraneous
-          # Prevents ArgoCD from trying to prune or delete the secret automatically
           argocd.argoproj.io/sync-options: Prune=false
   data:
     - secretKey: "admin.password"
       remoteRef:
-        key: "argocd"                # The secret path name you made in the Vault UI
-        property: "admin.password"   # The Key name you added inside that secret path
+        key: "argocd"                
+        property: "admin.password"   
