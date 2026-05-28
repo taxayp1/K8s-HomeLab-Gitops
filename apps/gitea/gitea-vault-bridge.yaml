@@ -32,11 +32,11 @@ spec:
       remoteRef:
         key: gitea
         property: db-password
-    - secretKey: admin-username
+    - secretKey: username
       remoteRef:
         key: gitea
-        property: admin-username
-    - secretKey: admin-password
+        property: username
+    - secretKey: password
       remoteRef:
         key: gitea
-        property: admin-password
+        property: password

@@ -34,9 +34,6 @@ spec:
                     key: db-password
           admin:
             existingSecret: gitea-db-secrets
-            username: ""
-            usernameKey: admin-username
-            passwordKey: admin-password
 
         persistence:
           enabled: true
