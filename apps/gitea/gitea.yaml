@@ -27,10 +27,15 @@ spec:
               HOST: "gitea-postgres-service:5432"
               NAME: "gitea"
               USER: "gitea"
+              # Passes the database secret to the Gitea application config
+              PASSWD:
+                valueFrom:
+                  secretKeyRef:
+                    name: gitea-db-secrets
+                    key: db-password
           admin:
             username: taxayp
             existingSecret: gitea-db-secrets
-            usernameKey: admin-password
             passwordKey: admin-password
 
         persistence:
