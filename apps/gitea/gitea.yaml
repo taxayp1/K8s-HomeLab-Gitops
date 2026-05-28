@@ -25,6 +25,7 @@ spec:
             database:
               DB_TYPE: postgres
               HOST: "gitea-postgres-service:5432"
+              # FORCE RE-ROUTE TO THE CORRECT DATABASE NAME
               NAME: "gitea"
               USER: "gitea"
               PASSWD:
