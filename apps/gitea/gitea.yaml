@@ -22,11 +22,14 @@ spec:
           config:
             APP_NAME: "Patel Homelab Git Core"
             RUN_MODE: prod
+            # Hard-override the core database ini settings directly
             database:
               DB_TYPE: postgres
               HOST: "gitea-postgres-service:5432"
               NAME: "gitea"
               USER: "gitea"
+              DB_USER: "gitea"
+              DB_NAME: "gitea"
               PASSWD:
                 valueFrom:
                   secretKeyRef:
@@ -36,19 +39,6 @@ spec:
             existingSecret: gitea-db-secrets
             usernameKey: username
             passwordKey: password
-
-        # ROOT LEVEL OVERRIDE: Tells the Helm templates to connect to your standalone DB
-        database:
-          builtIn:
-            postgresql: false
-          type: postgres
-          host: "gitea-postgres-service"
-          port: 5432
-          name: "gitea"
-          user: "gitea"
-          passwordFromSecret:
-            name: gitea-db-secrets
-            key: db-password
 
         persistence:
           enabled: true
