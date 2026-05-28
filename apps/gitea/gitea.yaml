@@ -34,8 +34,7 @@ spec:
 
         # THE TRUE FIX: The official chart requires env vars to be 
         # injected at the root level under 'deployment', NOT inside 'gitea'.
-        deployment:
-          env:
+        extraVars:
             - name: GITEA__database__PASSWD
               valueFrom:
                 secretKeyRef:
