@@ -44,6 +44,12 @@ spec:
               enabled: true
               storageClass: "longhorn"
               size: 5Gi
+            extraVolumes:
+              - name: postgres-run
+                emptyDir: {}
+            extraVolumeMounts:
+              - name: postgres-run
+                mountPath: /var/run/postgresql
 
         redis-cluster:
           enabled: false
