@@ -1,0 +1,57 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gitea
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://dl.gitea.com/charts/
+    chart: gitea
+    targetRevision: 10.2.0 
+    helm:
+      values: |
+        gitea:
+          config:
+            APP_NAME: "Patel Homelab Git Core"
+            RUN_MODE: prod
+          admin:
+            username: taxayp
+            # Pulls the admin password automatically from the synced Vault secret
+            existingSecret: gitea-db-secrets
+            passwordKey: admin-password
+        
+        # Database Configuration (PostgreSQL StatefulSet)
+        postgresql:
+          enabled: true
+          global:
+            postgresql:
+              auth:
+                username: gitea
+                database: gitea
+                existingSecret: gitea-db-secrets
+                secretKeys:
+                  userPasswordKey: db-password
+                  adminPasswordKey: db-password
+          primary:
+            persistence:
+              enabled: true
+              storageClass: "longhorn"
+              size: 5Gi
+
+        # Raw Git Repository Storage
+        persistence:
+          enabled: true
+          storageClass: "longhorn"
+          size: 15Gi
+          accessModes:
+            - ReadWriteOnce
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: gitea
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
