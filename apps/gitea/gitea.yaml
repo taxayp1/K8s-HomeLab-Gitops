@@ -27,10 +27,6 @@ spec:
 
         postgresql:
           enabled: true
-          image:
-            registry: quay.io
-            repository: bitnami/postgresql
-            tag: 16.3.0
           auth:
             username: gitea
             database: gitea
