@@ -25,7 +25,6 @@ spec:
             database:
               DB_TYPE: postgres
               HOST: "gitea-postgres-service:5432"
-              # FORCE RE-ROUTE TO THE CORRECT DATABASE NAME
               NAME: "gitea"
               USER: "gitea"
               PASSWD:
@@ -35,6 +34,21 @@ spec:
                     key: db-password
           admin:
             existingSecret: gitea-db-secrets
+            usernameKey: username
+            passwordKey: password
+
+        # ROOT LEVEL OVERRIDE: Tells the Helm templates to connect to your standalone DB
+        database:
+          builtIn:
+            postgresql: false
+          type: postgres
+          host: "gitea-postgres-service"
+          port: 5432
+          name: "gitea"
+          user: "gitea"
+          passwordFromSecret:
+            name: gitea-db-secrets
+            key: db-password
 
         persistence:
           enabled: true
