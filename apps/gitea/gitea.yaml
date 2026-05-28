@@ -22,23 +22,22 @@ spec:
           config:
             APP_NAME: "Patel Homelab Git Core"
             RUN_MODE: prod
-            # Hard-override the core database ini settings directly
             database:
               DB_TYPE: postgres
               HOST: "gitea-postgres-service:5432"
               NAME: "gitea"
               USER: "gitea"
-              DB_USER: "gitea"
-              DB_NAME: "gitea"
-              PASSWD:
-                valueFrom:
-                  secretKeyRef:
-                    name: gitea-db-secrets
-                    key: db-password
           admin:
             existingSecret: gitea-db-secrets
             usernameKey: username
             passwordKey: password
+
+        extraEnvironmentVars:
+          - name: GITEA__database__PASSWD
+            valueFrom:
+              secretKeyRef:
+                name: gitea-db-secrets
+                key: db-password
 
         persistence:
           enabled: true
