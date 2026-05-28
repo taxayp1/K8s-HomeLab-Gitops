@@ -24,9 +24,13 @@ spec:
         # Database Configuration (PostgreSQL StatefulSet)
         postgresql-ha:
           enabled: false
-          
+
         postgresql:
           enabled: true
+          image:
+            registry: gcr.io
+            repository: bitnami-containers/postgresql
+            tag: 16.3.0
           global:
             postgresql:
               auth:
@@ -40,7 +44,11 @@ spec:
             persistence:
               enabled: true
               storageClass: "longhorn"
-              size: 5Gi
+        
+            size: 5Gi
+
+        redis-cluster:
+          enabled: false       
 
         # Raw Git Repository Storage
         persistence:
