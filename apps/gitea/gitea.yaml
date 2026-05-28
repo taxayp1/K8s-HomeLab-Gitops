@@ -17,7 +17,6 @@ spec:
             RUN_MODE: prod
           admin:
             username: taxayp
-            # Pulls the admin password automatically from the synced Vault secret
             existingSecret: gitea-db-secrets
             passwordKey: admin-password
         
@@ -31,14 +30,17 @@ spec:
             registry: docker.io
             repository: library/postgres
             tag: "16.3"
-          auth:
-            username: gitea
-            database: gitea
-            existingSecret: gitea-db-secrets
-            secretKeys:
-              userPasswordKey: db-password
-              adminPasswordKey: db-password
           primary:
+            extraEnvVars:
+              - name: POSTGRES_USER
+                value: "gitea"
+              - name: POSTGRES_DB
+                value: "gitea"
+              - name: POSTGRES_PASSWORD
+                valueFrom:
+                  secretKeyRef:
+                    name: gitea-db-secrets
+                    key: db-password
             persistence:
               enabled: true
               storageClass: "longhorn"
