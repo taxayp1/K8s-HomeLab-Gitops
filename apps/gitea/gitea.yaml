@@ -17,7 +17,6 @@ spec:
           enabled: false
         redis-cluster:
           enabled: false
-
         gitea:
           admin:
             existingSecret: gitea-db-secrets
@@ -31,16 +30,12 @@ spec:
               HOST: "gitea-postgres-service:5432"
               NAME: "gitea"
               USER: "gitea"
-
-        # THE TRUE FIX: The official chart requires env vars to be 
-        # injected at the root level under 'deployment', NOT inside 'gitea'.
         extraVars:
             - name: GITEA__database__PASSWD
               valueFrom:
                 secretKeyRef:
                   name: gitea-db-secrets
                   key: db-password
-
         persistence:
           enabled: true
           storageClass: "longhorn"
