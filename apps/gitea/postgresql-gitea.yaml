@@ -46,7 +46,6 @@ spec:
               value: "gitea"
             - name: POSTGRES_USER
               value: "gitea"
-            # Crucial: Instructs Postgres to initialize in a clean subfolder away from lost+found
             - name: PGDATA
               value: /var/lib/postgresql/data/pgdata
             - name: POSTGRES_PASSWORD
