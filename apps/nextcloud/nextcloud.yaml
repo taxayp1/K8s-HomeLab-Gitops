@@ -35,6 +35,12 @@ spec:
           env:
             - name: POSTGRES_HOST
               value: "nextcloud-db.nextcloud.svc.cluster.local"
+            - name: OVERWRITEPROTOCOL    
+              value: "https"            
+            - name: OVERWRITECLIURL        
+              value: "https://nextcloud.taxayp.com" 
+            - name: OVERWRITEHOST          
+              value: "nextcloud.taxayp.com" 
             - name: POSTGRES_DB
               value: "nextcloud"
             - name: POSTGRES_USER
