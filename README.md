@@ -26,10 +26,10 @@ The `infrastructure/` directory separates core system platform layers from state
 │   └── storage/        # Multi-Replica Distributed Block Storage Array (Longhorn Engine)
 
 
-##Infrastructure Lifecycle & Dependencies
+Infrastructure Lifecycle & Dependencies
 
 This platform is split into two distinct, declarative layers. Before deploying this GitOps repository, the underlying bare-metal virtualization, virtual machines, and networking topology must be provisioned.
 
-**Infrastructure-as-Code Layer: [Proxmox Core Virtualization & Terraform Provisioning](github.com/taxayp1/Proxmox-Terraform-Infra-For-K8s) — This repository handles the creation of the 3 contorlplane nodes, 3 worker nodes, CPU/RAM allocation, and static IP mapping inside the Proxmox VE environment.
+Infrastructure-as-Code Layer: [Proxmox Core Virtualization & Terraform Provisioning](https://github.com/taxayp1/Proxmox-Terraform-Infra-For-K8s.git) — This repository handles the creation of the 3 contorlplane nodes, 3 worker nodes, CPU/RAM allocation, and static IP mapping inside the Proxmox VE environment.
 
-**GitOps Platform Layer: (This Repository) — Handles cluster-native system applications, secrets automation, and routing once Kubernetes is online.
+GitOps Platform Layer: (This Repository) — Handles cluster-native system applications, secrets automation, and routing once Kubernetes is online.
