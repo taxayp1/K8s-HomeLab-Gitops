@@ -28,6 +28,7 @@ spec:
       labels:
         app: nextcloud
     spec:
+      nodeName: wk-02
       containers:
         - name: nextcloud
           image: docker.io/library/nextcloud:stable
