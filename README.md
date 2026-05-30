@@ -25,6 +25,7 @@ The `infrastructure/` directory separates core system platform layers from state
 │   ├── security/       # Zero-Trust Cryptographic Secrets (Vault & External Secrets Operator)
 │   └── storage/        # Multi-Replica Distributed Block Storage Array (Longhorn Engine)
 
+---
 
 Infrastructure Lifecycle & Dependencies
 
