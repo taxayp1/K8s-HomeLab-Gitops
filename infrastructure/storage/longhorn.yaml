@@ -18,6 +18,8 @@ spec:
           defaultReplicaCount: 3
           guaranteedEngineManagerCPU: 0
           guaranteedReplicaManagerCPU: 0
+          backupTarget: s3://my-longhorn-backups-syd@ap-southeast-2/
+          backupTargetCredentialSecret: aws-secret
           replicaSoftAntiAffinity: true
   destination:
     server: https://kubernetes.default.svc
