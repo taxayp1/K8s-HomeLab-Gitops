@@ -18,7 +18,7 @@ spec:
         protocol: TCP
   - fromEndpoints:
     - matchLabels:
-        io.kubernetes.pod.namespace: cert-manager
+        io.kubernetes.pod.namespace: external-secrets
     toPorts:
     - ports:
       - port: "8200"
