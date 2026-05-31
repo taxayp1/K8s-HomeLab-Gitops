@@ -10,7 +10,8 @@ spec:
   ingress:
   - fromEndpoints:
     - matchLabels:
-        app.kubernetes.io/name: ingress-nginx 
+        io.kubernetes.pod.namespace: ingress-nginx
+        app.kubernetes.io/component: controller
     toPorts:
     - ports:
       - port: "80"
@@ -21,7 +22,7 @@ spec:
         app: nextcloud-db 
   - toEndpoints:
     - matchLabels:
-        k8s-app: kube-dns # Allows CoreDNS resolution
+        k8s-app: kube-dns
       toPorts:
       - ports:
         - port: "53"

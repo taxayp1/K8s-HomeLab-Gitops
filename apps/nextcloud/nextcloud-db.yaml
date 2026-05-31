@@ -26,7 +26,6 @@ spec:
       labels:
         app: nextcloud-db
     spec:
-      nodeName: wk-03
       containers:
         - name: postgres
           image: docker.io/library/postgres:16.3
