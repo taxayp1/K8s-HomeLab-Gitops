@@ -1,0 +1,38 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: cert-manager-security-policy
+  namespace: cert-manager
+spec:
+  endpointSelector:
+    matchLabels:
+      io.kubernetes.pod.namespace: cert-manager
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        io.kubernetes.pod.namespace: vault
+        app.kubernetes.io/name: vault
+    toPorts:
+    - ports:
+      - port: "8200"
+        protocol: TCP
+  - toEndpoints:
+    - matchLabels:
+        io.kubernetes.pod.namespace: kube-system
+        k8s-app: kube-dns
+    toPorts:
+    - ports:
+      - port: "53"
+        protocol: UDP
+      - port: "53"
+        protocol: TCP
+      rules:
+        dns:
+        - matchPattern: "*"
+  - toFQDNs:
+    - matchName: "acme-v02.api.letsencrypt.org"
+    - matchPattern: "*.cloudflare.com"
+    toPorts:
+    - ports:
+      - port: "443"
+        protocol: TCP

@@ -1,0 +1,41 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: vault-security-policy
+  namespace: vault
+spec:
+  endpointSelector:
+    matchLabels:
+      app.kubernetes.io/name: vault
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        io.kubernetes.pod.namespace: ingress-nginx
+        app.kubernetes.io/component: controller
+    toPorts:
+    - ports:
+      - port: "8200"
+        protocol: TCP
+  - fromEndpoints:
+    - matchLabels:
+        io.kubernetes.pod.namespace: cert-manager
+    toPorts:
+    - ports:
+      - port: "8200"
+        protocol: TCP
+  egress:
+  - toEntities:
+    - kube-apiserver
+  - toEndpoints:
+    - matchLabels:
+        io.kubernetes.pod.namespace: kube-system
+        k8s-app: kube-dns
+    toPorts:
+    - ports:
+      - port: "53"
+        protocol: UDP
+      - port: "53"
+        protocol: TCP
+      rules:
+        dns:
+        - matchPattern: "*"
