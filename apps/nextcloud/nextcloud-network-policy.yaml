@@ -1,0 +1,31 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: nextcloud-security-policy
+  namespace: nextcloud
+spec:
+  endpointSelector:
+    matchLabels:
+      app: nextcloud
+  ingress:
+  - fromEndpoints:
+    - matchLabels:
+        app.kubernetes.io/name: ingress-nginx 
+    toPorts:
+    - ports:
+      - port: "80"
+        protocol: TCP
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        app: nextcloud-db 
+  - toEndpoints:
+    - matchLabels:
+        k8s-app: kube-dns # Allows CoreDNS resolution
+      toPorts:
+      - ports:
+        - port: "53"
+          protocol: UDP
+        rules:
+          dns:
+          - matchPattern: "*"
