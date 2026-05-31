@@ -28,10 +28,16 @@ spec:
       labels:
         app: nextcloud
     spec:
-      nodeName: wk-02
       containers:
         - name: nextcloud
           image: docker.io/library/nextcloud:stable
+          resources:
+          requests:
+            cpu: "200m"
+            memory: "512Mi"
+          limits:
+            cpu: "500m"
+            memory: "1Gi"
           env:
             - name: POSTGRES_HOST
               value: "nextcloud-db.nextcloud.svc.cluster.local"
