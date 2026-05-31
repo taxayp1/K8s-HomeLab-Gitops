@@ -23,10 +23,10 @@ spec:
   - toEndpoints:
     - matchLabels:
         k8s-app: kube-dns
-      toPorts:
-      - ports:
-        - port: "53"
-          protocol: UDP
-        rules:
-          dns:
-          - matchPattern: "*"
+    toPorts:               
+    - ports:
+      - port: "53"
+        protocol: UDP
+      rules:
+        dns:
+        - matchPattern: "*"
