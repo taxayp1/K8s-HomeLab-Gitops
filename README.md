@@ -13,18 +13,23 @@ Repository Map & Architecture Blueprint
 
 The `infrastructure/` directory separates core system platform layers from stateless application spaces, following cloud-native organizational standards.
 ```text
-├── core-workloads/ # Heavy, stateful enterprise applications (e.g., Nextcloud)
-├── apps/           # Lightweight, stateless cluster applications
-├── infrastructure/
-│   ├── argocd/         # The Continuous Delivery Engine (Manages itself via GitOps)
-│   ├── gitea/          # Internal Git Server & Source of Truth
-│   ├── ingress/        # External Routing Layer (Ingress-NGINX + Cloudflare DNS)
-│   ├── loadbalancer/   # L4 On-Premises Cloud Networking (MetalLB App & Subnet Mapping)
-│   ├── logging/        # Log Gathering Engine (Grafana Loki & Promtail DaemonSets)
-│   ├── monitoring/     # Metrics Pipeline (Prometheus Operator Stack & Grafana Dashboards)
-│   ├── security/       # Zero-Trust Cryptographic Secrets (Vault & External Secrets Operator)
-│   └── storage/        # Multi-Replica Distributed Block Storage Array (Longhorn Engine)
-
+├.
+├── apps/                        # All user and functional business applications
+│   ├── gitea/                  # Internal Git Server & repository management
+│   ├── nextcloud/              # Heavyweight self-hosted productivity suite
+│   └── whoami/                 # Lightweight network diagnostic/debugging tool
+├── clusters/
+│   └── homelab/                # Target environment bootstrap & App-of-Apps roots
+│       ├── argo-apps.yaml      # ArgoCD App-of-Apps pattern controller
+│       └── kustomization.yaml  # Base environment cluster overlays
+├── infrastructure/              # Base cluster platform engines and utilities
+│   ├── argocd/                 # The Continuous Delivery Engine (Self-managed GitOps)
+│   ├── ingress-nginx/          # External L7 Routing Layer & Hubble Ingress paths
+│   ├── loadbalancer/           # On-Premises bare-metal IP assignment (MetalLB)
+│   ├── logging/                # Distributed cluster log aggregation
+│   ├── monitoring/             # Metrics pipeline (Prometheus & Grafana dashboards)
+│   └── security/               # Zero-Trust secrets & certificates (Vault, ESO, Cert-Manager)
+└── kustomization.yaml          # Root cluster orchestration configuration
 ---
 
 Infrastructure Lifecycle & Dependencies
