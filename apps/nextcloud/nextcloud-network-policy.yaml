@@ -33,5 +33,3 @@ spec:
         rules:
           dns:
           - matchPattern: "*"
-  - toEntities:
-    - world
