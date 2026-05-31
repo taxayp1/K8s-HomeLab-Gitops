@@ -1,0 +1,44 @@
+apiVersion: "cilium.io/v2"
+kind: CiliumNetworkPolicy
+metadata:
+  name: gitea-security-policy
+  namespace: gitea
+spec:
+  endpointSelector:
+    matchLabels:
+      # Targets your Gitea application pods
+      app: gitea
+  ingress:
+  # 1. Allow Traffic from Ingress Nginx Controller to Gitea Web UI
+  - fromEndpoints:
+    - matchLabels:
+        io.kubernetes.pod.namespace: ingress-nginx
+        app.kubernetes.io/component: controller
+    toPorts:
+    - ports:
+      - port: "3000"
+        protocol: TCP
+  egress:
+  - toEndpoints:
+    - matchLabels:
+        app: gitea-postgres
+  - toEndpoints:
+    - matchLabels:
+        io.kubernetes.pod.namespace: kube-system
+        k8s-app: kube-dns
+    toPorts:
+    - ports:
+      - port: "53"
+        protocol: UDP
+      - port: "53"
+        protocol: TCP
+      rules:
+        dns:
+        - matchPattern: "*"
+  - toFQDNs:
+    - matchName: "github.com"
+    - matchPattern: "*.githubusercontent.com"
+    toPorts:
+    - ports:
+      - port: "443"
+        protocol: TCP
