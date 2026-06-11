@@ -1,0 +1,52 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: promtail
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://grafana.github.io/helm-charts
+    chart: promtail
+    targetRevision: 6.15.3
+    helm:
+      values: |
+        fullnameOverride: "promtail"
+        config:
+          clients:
+            - url: http://loki.logging.svc.cluster.local:3100/loki/api/v1/push
+          snippets:
+            extraScrapeConfigs: |
+              
+              - job_name: cilium-flow-logs
+                static_configs:
+                  - targets: [localhost]
+                    labels:
+                      job: cilium-flows
+                      __path__: /var/log/cilium/flow.log                           
+        extraVolumes:
+          - name: cilium-logs
+            hostPath:
+              path: /var/log/cilium
+        extraVolumeMounts:
+          - name: cilium-logs
+            mountPath: /var/log/cilium
+            readOnly: true
+
+        resources:
+          requests:
+            cpu: 50m
+            memory: 64Mi
+          limits:
+            cpu: 200m
+            memory: 128Mi
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: logging
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

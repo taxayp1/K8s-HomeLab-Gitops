@@ -1,0 +1,38 @@
+apiVersion: external-secrets.io/v1
+kind: SecretStore
+metadata:
+  name: vault-backend
+  namespace: monitoring 
+spec:
+  provider:
+    vault:
+      server: "http://vault.vault.svc.cluster.local:8200"
+      path: "kv"
+      version: "v2"
+      auth:
+        kubernetes:
+          mountPath: "kubernetes"
+          role: "argocd-role"
+---
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: grafana-admin-credentials-sync
+  namespace: monitoring
+spec:
+  refreshInterval: "1m"
+  secretStoreRef:
+    name: vault-backend
+    kind: SecretStore
+  target:
+    name: grafana-admin-credentials 
+    creationPolicy: "Owner"    
+  data:
+    - secretKey: "admin-user"
+      remoteRef:
+        key: "grafana"
+        property: "admin-user"
+    - secretKey: "admin-password"
+      remoteRef:
+        key: "grafana"
+        property: "admin-password"

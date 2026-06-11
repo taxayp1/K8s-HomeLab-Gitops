@@ -1,0 +1,99 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gitlab
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: 'https://charts.gitlab.io/'
+    targetRevision: 9.2.0
+    chart: gitlab
+    helm:
+      values: |
+        upgradeCheck:
+          enabled: false
+
+        global:
+          edition: ce
+          hosts:
+            domain: taxayp.com
+            https: true
+          ingress:
+            configureCertmanager: false
+            enabled: false
+            provider: nginx
+          psql:
+            host: gitlab-postgres-rw.gitlab.svc.cluster.local
+            port: 5432
+            database: gitlabhq_production
+            username: gitlab
+            password:
+              secret: gitlab-db-credentials
+              key: password
+          redis:
+            host: gitlab-redis-master.gitlab.svc.cluster.local
+            port: 6379
+            password:
+              secret: gitlab-redis-secret
+              key: secret
+          kas:
+            enabled: false
+
+        certmanager:
+          install: false
+        nginx-ingress:
+          enabled: false
+        prometheus:
+          install: false
+        postgresql:
+          install: false
+        gitlab-runner:
+          install: false
+        gitlab-zoekt:
+          install: false
+        openbao:
+          install: false
+        ai-gateway:
+          install: false
+
+        redis:
+          install: false
+
+        gitlab:
+          webservice:
+            minReplicas: 1
+            maxReplicas: 1
+            workerProcesses: 2
+            resources:
+              requests:
+                memory: "2Gi"
+                cpu: "200m"
+              limits:
+                memory: "3.5Gi"
+                cpu: "1000m"
+          sidekiq:
+            minReplicas: 1
+            maxReplicas: 1
+            resources:
+              requests:
+                memory: "1Gi"
+                cpu: "100m"
+              limits:
+                memory: "1.5Gi"
+                cpu: "500m"
+          gitaly:
+            resources:
+              requests:
+                memory: "1Gi"
+                cpu: "100m"
+              limits:
+                memory: "2Gi"
+                cpu: "500m"
+
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: gitlab
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true

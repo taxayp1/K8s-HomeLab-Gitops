@@ -1,0 +1,26 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: longhorn
+  namespace: argocd
+spec:
+  project: default
+  source:
+    chart: longhorn
+    repoURL: https://charts.longhorn.io
+    targetRevision: 1.11.2
+    helm:
+      values: |
+        persistence:
+          defaultClass: true
+        defaultSettings:
+          defaultDataPath: /mnt/longhorn-nvme/
+          defaultReplicaCount: 3
+          guaranteedEngineManagerCPU: 0
+          guaranteedReplicaManagerCPU: 0
+          backupTarget: s3://my-longhorn-backups-syd@ap-southeast-2/
+          backupTargetCredentialSecret: aws-secret
+          replicaSoftAntiAffinity: true
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: longhorn-system

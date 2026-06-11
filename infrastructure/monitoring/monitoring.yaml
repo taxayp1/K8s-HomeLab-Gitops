@@ -1,0 +1,77 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kube-prometheus-stack
+  namespace: argocd
+spec:
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - ServerSideApply=true 
+      - CreateNamespace=true
+  project: default
+  source:
+    repoURL: https://prometheus-community.github.io/helm-charts
+    chart: kube-prometheus-stack
+    targetRevision: 85.1.1
+    helm:
+      values: |
+        grafana:
+          resources:
+            requests:
+              memory: 150Mi
+              cpu: 100m
+            limits:
+              memory: 512Mi
+              cpu: 500m
+          persistence:
+            enabled: true
+            storageClassName: "longhorn"
+            size: 2Gi
+            accessModes:
+              - ReadWriteOnce
+          admin:
+            existingSecret: grafana-admin-credentials
+            userKey: admin-user
+            passwordKey: admin-password
+          additionalDataSources:
+          - access: proxy
+            jsonData:
+              maxLines: 1000
+            name: Loki
+            type: loki
+            url: http://loki.logging.svc.cluster.local:3100
+        
+        kubeControllerManager:
+          enabled: true
+        kubeScheduler:
+          enabled: true
+        kubeEtcd:
+          enabled: true
+          
+        prometheus:
+          prometheusSpec:
+            serviceMonitorSelectorNilUsesHelmValues: false
+            podMonitorSelectorNilUsesHelmValues: false
+            scrapeInterval: 60s
+            evaluationInterval: 60s
+            resources:
+              limits:
+                memory: 800Mi
+                cpu: 500m
+              requests:
+                memory: 400Mi
+                cpu: 200m
+            retention: 2d
+            storageSpec:
+              volumeClaimTemplate:
+                spec:
+                  resources:
+                    requests:
+                      storage: 10Gi
+                  storageClassName: longhorn
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: monitoring

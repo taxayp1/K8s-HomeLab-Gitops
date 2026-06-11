@@ -1,0 +1,32 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: gitlab-postgres
+  namespace: gitlab
+spec:
+  instances: 2
+  imageName: ghcr.io/cloudnative-pg/postgresql:16.3
+
+  storage:
+    size: 10Gi
+    storageClass: longhorn
+
+  bootstrap:
+    initdb:
+      database: gitlabhq_production
+      owner: gitlab
+      secret:
+        name: gitlab-db-credentials
+
+  backup:
+    barmanObjectStore:
+      destinationPath: "s3://my-longhorn-backups-syd/backups/gitlab/"
+      s3Credentials:
+        accessKeyId:
+          key: AWS_ACCESS_KEY_ID
+          name: gitlab-db-credentials
+        secretAccessKey:
+          key: AWS_SECRET_ACCESS_KEY
+          name: gitlab-db-credentials
+      wal:
+        compression: gzip
