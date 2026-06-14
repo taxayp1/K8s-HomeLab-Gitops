@@ -6,8 +6,9 @@ metadata:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-cloudflare
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-    nginx.ingress.kubernetes.io/ssl-passthrough: "false"
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    # 🟢 Fixed prefix formatting to ensure NGINX parses the directive correctly
+    nginx.ingress.kubernetes.io/ssl-passthrough: "false"
     nginx.ingress.kubernetes.io/proxy-body-size: "0"
 spec:
   ingressClassName: nginx
@@ -21,7 +22,8 @@ spec:
               service:
                 name: gitlab-webservice-default  
                 port:
-                  number: 8181
+                  # 🟢 Target port changed to route through the workhorse reverse proxy
+                  name: http-workhorse       
   tls:
     - hosts:
         - gitlab.taxayp.com
