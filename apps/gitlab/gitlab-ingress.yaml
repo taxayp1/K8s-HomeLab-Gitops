@@ -6,7 +6,7 @@ metadata:
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-cloudflare
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-    ingress.kubernetes.io/ssl-passthrough: "false"
+    nginx.ingress.kubernetes.io/ssl-passthrough: "false"
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/proxy-body-size: "0"
 spec:
@@ -21,7 +21,7 @@ spec:
               service:
                 name: gitlab-webservice-default  
                 port:
-                  number: 8080      
+                  number: 8181
   tls:
     - hosts:
         - gitlab.taxayp.com
