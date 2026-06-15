@@ -90,7 +90,6 @@ spec:
               limits:
                 memory: "2Gi"
                 cpu: "500m"
-
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: gitlab
