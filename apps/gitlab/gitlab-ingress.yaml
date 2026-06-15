@@ -23,7 +23,7 @@ spec:
               service:
                 name: gitlab-webservice-default  
                 port:
-                  name: http-workhorse       
+                  number: 8080
   tls:
     - hosts:
         - gitlab.taxayp.com
