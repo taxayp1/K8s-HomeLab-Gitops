@@ -1,3 +1,18 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: gitlab-prod-tls
+  namespace: gitlab
+spec:
+  secretName: gitlab-prod-tls
+  issuerRef:
+    name: letsencrypt-cloudflare
+    kind: ClusterIssuer
+  dnsNames:
+    - gitlab.taxayp.com
+
+---
+
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
@@ -7,7 +22,6 @@ metadata:
     cert-manager.io/cluster-issuer: letsencrypt-cloudflare
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
-    # 🟢 Fixed prefix formatting to ensure NGINX parses the directive correctly
     nginx.ingress.kubernetes.io/ssl-passthrough: "false"
     nginx.ingress.kubernetes.io/proxy-body-size: "0"
 spec:
@@ -22,7 +36,6 @@ spec:
               service:
                 name: gitlab-webservice-default  
                 port:
-                  # 🟢 Target port changed to route through the workhorse reverse proxy
                   name: http-workhorse       
   tls:
     - hosts:
