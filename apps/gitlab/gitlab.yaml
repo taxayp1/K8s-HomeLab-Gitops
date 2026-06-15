@@ -62,7 +62,6 @@ spec:
 
         gitlab:
           webservice:
-            publishNotReadyAddresses: true
             minReplicas: 1
             maxReplicas: 1
             workerProcesses: 2
