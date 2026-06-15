@@ -9,6 +9,14 @@ spec:
       io.kubernetes.pod.namespace: cert-manager
   egress:
   - toEntities:
+    - world
+    toPorts:
+    - ports:
+      - port: "53"
+        protocol: UDP
+      - port: "53"
+        protocol: TCP
+  - toEntities:
     - kube-apiserver
     toPorts:
     - ports:
