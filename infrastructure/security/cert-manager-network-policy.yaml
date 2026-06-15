@@ -8,48 +8,63 @@ spec:
     matchLabels:
       io.kubernetes.pod.namespace: cert-manager
   egress:
-  - toEntities:
-    - kube-apiserver
-    toPorts:
-    - ports:
-      - port: "443"
-        protocol: TCP
-      - port: "6443"
-        protocol: TCP
-  - toEntities:
-    - host
-    - remote-node
-    toPorts:
-    - ports:
-      - port: "443"
-        protocol: TCP
-      - port: "6443"
-        protocol: TCP
-  - toEndpoints:
-    - matchLabels:
-        io.kubernetes.pod.namespace: vault
-        app.kubernetes.io/name: vault
-    toPorts:
-    - ports:
-      - port: "8200"
-        protocol: TCP
-  - toEndpoints:
-    - matchLabels:
-        io.kubernetes.pod.namespace: kube-system
-        k8s-app: kube-dns
-    toPorts:
-    - ports:
-      - port: "53"
-        protocol: UDP
-      - port: "53"
-        protocol: TCP
-      rules:
-        dns:
-        - matchPattern: "*"
-  - toFQDNs:
-    - matchName: "acme-v02.api.letsencrypt.org"
-    - matchPattern: "*.cloudflare.com"
-    toPorts:
-    - ports:
-      - port: "443"
-        protocol: TCP
+    - toEntities:
+        - kube-apiserver
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+            - port: "6443"
+              protocol: TCP
+    - toEntities:
+        - host
+        - remote-node
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+            - port: "6443"
+              protocol: TCP
+
+    - toEndpoints:
+        - matchLabels:
+            {} 
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
+            - port: "8443"
+              protocol: TCP
+            - port: "9443"
+              protocol: TCP
+
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: vault
+            app.kubernetes.io/name: vault
+      toPorts:
+        - ports:
+            - port: "8200"
+              protocol: TCP
+              
+    - toEndpoints:
+        - matchLabels:
+            io.kubernetes.pod.namespace: kube-system
+            k8s-app: kube-dns
+      toPorts:
+        - ports:
+            - port: "53"
+              protocol: UDP
+            - port: "53"
+              protocol: TCP
+          rules:
+            dns:
+              - matchPattern: "*"
+              
+    - toFQDNs:
+        - matchName: "acme-v02.api.letsencrypt.org"
+        - matchPattern: "*.cloudflare.com"
+      toPorts:
+        - ports:
+            - port: "443"
+              protocol: TCP
