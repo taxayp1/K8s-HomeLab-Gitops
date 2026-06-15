@@ -39,6 +39,9 @@ spec:
               key: secret
           kas:
             enabled: false
+          # 🟢 FIX 1: Tell the global framework that internal MinIO is active
+          minio:
+            enabled: true
 
         certmanager:
           install: false
@@ -59,11 +62,15 @@ spec:
         redis:
           install: false
 
-        # 🟢 FIXED: MinIO sits at the root values layer alongside the other components
+        # 🟢 FIX 2: Explicitly define the MinIO deployment block at the root layer
         minio:
           install: true
           persistence:
             size: 10Gi
+          credentials:
+            secretName: gitlab-minio-secret
+          accessKey: "minio"
+          secretKey: "gldemo123"
 
         gitaly:
           persistence:
