@@ -56,9 +56,25 @@ spec:
           install: false
         ai-gateway:
           install: false
-
         redis:
           install: false
+
+        # 🟢 FIXED: MinIO sits at the root values layer alongside the other components
+        minio:
+          install: true
+          persistence:
+            size: 10Gi
+
+        gitaly:
+          persistence:
+            size: 10Gi
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "100m"
+            limits:
+              memory: "2Gi"
+              cpu: "500m"
 
         gitlab:
           webservice:
@@ -81,16 +97,6 @@ spec:
                 cpu: "100m"
               limits:
                 memory: "1.5Gi"
-                cpu: "500m"
-          gitaly:
-            persistence:
-             size: 10Gi
-            resources:
-              requests:
-                memory: "1Gi"
-                cpu: "100m"
-              limits:
-                memory: "2Gi"
                 cpu: "500m"
   destination:
     server: 'https://kubernetes.default.svc'
