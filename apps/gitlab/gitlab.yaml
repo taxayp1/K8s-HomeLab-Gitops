@@ -15,6 +15,10 @@ spec:
           enabled: false
 
         global:
+          adminAccount:
+            secret: gitlab-admin-account-secrets
+            usernameKey: username
+            passwordKey: password
           edition: ce
           hosts:
             domain: taxayp.com
@@ -39,7 +43,6 @@ spec:
               key: secret
           kas:
             enabled: false
-          # 🟢 FIX 1: Tell the global framework that internal MinIO is active
           minio:
             enabled: true
 
@@ -62,7 +65,6 @@ spec:
         redis:
           install: false
 
-        # 🟢 FIX 2: Explicitly define the MinIO deployment block at the root layer
         minio:
           install: true
           persistence:
