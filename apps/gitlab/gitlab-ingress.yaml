@@ -10,7 +10,6 @@ metadata:
     nginx.ingress.kubernetes.io/ssl-redirect: "true"
     nginx.ingress.kubernetes.io/ssl-passthrough: "false"
     nginx.ingress.kubernetes.io/proxy-body-size: "0"
-    ingress.kubernetes.io/reloaded-at: "2026-06-15-v1"
 spec:
   ingressClassName: nginx
   rules:
@@ -23,7 +22,7 @@ spec:
               service:
                 name: gitlab-webservice-default  
                 port:
-                  number: 8080
+                  name: http-workhorse       
   tls:
     - hosts:
         - gitlab.taxayp.com
