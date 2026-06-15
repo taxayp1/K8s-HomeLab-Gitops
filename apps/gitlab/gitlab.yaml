@@ -61,9 +61,6 @@ spec:
           install: false
 
         gitlab:
-          shared-secrets:
-            persistence:
-              size: 2Gi
           webservice:
             minReplicas: 1
             maxReplicas: 1
