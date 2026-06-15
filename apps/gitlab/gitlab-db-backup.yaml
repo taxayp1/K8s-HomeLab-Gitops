@@ -1,9 +1,9 @@
 apiVersion: postgresql.cnpg.io/v1
 kind: ScheduledBackup
 metadata:
-  name: gitea-postgres-daily
-  namespace: gitea
+  name: gitlab-postgres-daily
+  namespace: gitlab
 spec:
   schedule: "0 0 2 * * *"
   cluster:
-    name: gitea-postgres-new
+    name: gitlab-postgres
