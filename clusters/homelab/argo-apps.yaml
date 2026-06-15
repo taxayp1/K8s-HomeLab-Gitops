@@ -1,6 +1,25 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
+  name: root-bootstrap
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: 'https://gitea.taxayp.com/taxayp/K8s-HomeLab-Gitops.git'
+    targetRevision: HEAD
+    path: clusters/homelab
+  destination:
+    server: 'https://kubernetes.default.svc'
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: false 
+      selfHeal: false
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
   name: cluster-infrastructure
   namespace: argocd
 spec:
