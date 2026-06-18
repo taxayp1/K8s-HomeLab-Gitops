@@ -20,7 +20,7 @@ spec:
 
   backup:
     barmanObjectStore:
-      destinationPath: "s3://my-longhorn-backups-syd/backups/gitlab/"
+      destinationPath: "s3://my-longhorn-backups-syd/backups/gitlab/v2/"
       s3Credentials:
         accessKeyId:
           key: AWS_ACCESS_KEY_ID
