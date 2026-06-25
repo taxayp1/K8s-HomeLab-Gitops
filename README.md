@@ -3,9 +3,11 @@ Multi-Node GitOps Platform: Automated Kubernetes Infrastructure & Continuous Del
 This repository drives the declarative, GitOps-controlled application delivery platform running across a high-availability bare-metal Kubernetes (v1.35) cluster.
 
 Private GitOps Engine & Public Portfolio Mirror
+
 To emulate a true enterprise, air-gapped environment, the actual source of truth for this cluster is a self-hosted GitLab instance running internally. ArgoCD continuously syncs cluster state directly from the local GitLab server, which is configured with an automated push-mirror to sync all commits to this public GitHub repository for visibility.
 
 Repository Map & Architecture Blueprint
+
 The directory structure separates core system platform layers from stateless application spaces, following cloud-native organizational standards.
 ---
 
