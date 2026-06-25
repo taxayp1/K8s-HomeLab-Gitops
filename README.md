@@ -15,7 +15,7 @@ The `infrastructure/` directory separates core system platform layers from state
 ```text
 ├.
 ├── apps/                        # All user and functional business applications
-│   ├── gitea/                  # Internal Git Server & repository management
+│   ├── gitlab/                  # Internal GitLab Server & repository management
 │   ├── nextcloud/              # Heavyweight self-hosted productivity suite
 │   └── whoami/                 # Lightweight network diagnostic/debugging tool
 ├── clusters/
