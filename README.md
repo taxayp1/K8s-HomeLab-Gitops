@@ -1,23 +1,24 @@
 # Multi-Node GitOps Platform
+
 ### Automated Kubernetes Infrastructure & Continuous Delivery
 
-> Enterprise-inspired GitOps platform powering a high-availability bare-metal Kubernetes cluster using Argo CD, GitLab, Kustomize, and cloud-native tooling.
+> Enterprise-inspired GitOps platform powering a high-availability bare-metal Kubernetes cluster using Argo CD, GitLab CE, Kustomize, and cloud-native technologies.
 
 ---
 
-## Overview
+# Overview
 
-This repository serves as the declarative source for all Kubernetes platform components and application deployments running on my six-node high-availability homelab Kubernetes cluster.
+This repository serves as the declarative source for Kubernetes platform components and application deployments running on my six-node high-availability homelab Kubernetes cluster.
 
-The platform follows GitOps principles where every infrastructure and application change is committed to Git, automatically synchronized by Argo CD, and continuously reconciled against the desired cluster state.
+The platform follows GitOps principles where infrastructure and application changes are committed to Git, automatically synchronized by Argo CD, and continuously reconciled against the desired cluster state.
 
-The goal of this project is to simulate production Platform Engineering practices while continuously expanding into hybrid cloud deployments with AWS.
+The long-term objective is to evolve this environment into a hybrid Platform Engineering lab spanning both on-premises infrastructure and AWS.
 
 ---
 
 # Architecture
 
-```
+```text
                     Developer
                         │
                         ▼
@@ -43,50 +44,50 @@ Infrastructure Applications Monitoring
 
 Current platform consists of:
 
-- 3 Control Plane Nodes
-- 3 Worker Nodes
-- Bare-metal Kubernetes
-- GitOps-driven deployments
-- Kustomize configuration management
-- Self-hosted GitLab
-- Argo CD continuous delivery
-- MetalLB load balancing
-- NGINX Ingress Controller
-- Prometheus monitoring
-- Grafana dashboards
-- Loki log aggregation
-- Vault & External Secrets
-- cert-manager certificate automation
+* 3 Kubernetes Control Plane nodes
+* 3 Kubernetes Worker nodes
+* High Availability bare-metal Kubernetes cluster
+* GitOps deployment model with Argo CD
+* Kustomize configuration management
+* Self-hosted GitLab CE
+* MetalLB load balancer
+* NGINX Ingress Controller
+* Longhorn distributed storage
+* Prometheus monitoring
+* Grafana dashboards
+* Loki centralized logging
+* HashiCorp Vault
+* External Secrets Operator
+* cert-manager certificate automation
 
 ---
 
 # Private GitOps Engine & Public Portfolio Mirror
 
-To emulate an enterprise GitOps workflow, the production source of truth is hosted on an internally deployed GitLab CE instance running inside the Kubernetes cluster.
+To emulate an enterprise GitOps workflow, the production source of truth is hosted on an internally deployed GitLab CE instance running inside the Kubernetes environment.
 
-Argo CD continuously synchronizes cluster state directly from GitLab.
+Argo CD continuously synchronizes cluster state directly from the internal GitLab repository.
 
-GitLab automatically push-mirrors all commits to this public GitHub repository, allowing the project to remain publicly viewable while preserving an internal-first GitOps workflow.
+GitLab automatically push-mirrors all commits to this public GitHub repository, allowing the project to remain publicly accessible while preserving an internal-first GitOps workflow.
 
-```
+```text
 Developer
-      │
-      ▼
+     │
+     ▼
 Private GitLab
-      │
-      ├──► Argo CD
-      │
-      └──► Push Mirror
-                │
-                ▼
-        Public GitHub
+     │
+     ├────────────► Argo CD
+     │               (Pull Model)
+     │
+     └────────────► GitHub
+                 (Push Mirror)
 ```
 
 ---
 
 # Repository Structure
 
-```
+```text
 .
 ├── apps/
 │   ├── gitlab/
@@ -113,38 +114,42 @@ Private GitLab
 
 # Technology Stack
 
-## Kubernetes
+## Kubernetes Platform
 
-- Kubernetes
-- Kustomize
-- Argo CD
-- NGINX Ingress
-- MetalLB
+* Kubernetes
+* Argo CD
+* Kustomize
+* NGINX Ingress Controller
+* MetalLB
 
 ## CI/CD
 
-- GitLab CE
-- GitLab Runner
-- GitOps
+* GitLab CE
+* GitOps
+
+> GitLab CI/CD integration is currently under development.
 
 ## Observability
 
-- Prometheus
-- Grafana
-- Loki
+* Prometheus
+* Grafana
+* Loki
 
 ## Security
 
-- HashiCorp Vault
-- External Secrets Operator
-- cert-manager
+* HashiCorp Vault
+* External Secrets Operator
+* cert-manager
+
+## Storage
+
+* Longhorn
 
 ## Infrastructure
 
-- Proxmox VE
-- Terraform
-- Ubuntu Server
-- Longhorn (planned)
+* Proxmox VE
+* Terraform
+* Ubuntu Server
 
 ---
 
@@ -157,46 +162,49 @@ The underlying infrastructure is provisioned separately using Terraform.
 Infrastructure Repository:
 
 **Proxmox Kubernetes Infrastructure**
+
 https://github.com/taxayp1/Proxmox-Terraform-Infra-For-K8s
 
 That repository provisions:
 
-- Proxmox virtual machines
-- CPU & Memory allocation
-- Networking
-- Static IP assignments
-- Kubernetes nodes
+* Proxmox virtual machines
+* CPU & Memory allocation
+* Static IP addressing
+* Base operating system
+* Kubernetes node infrastructure
 
-Once Kubernetes becomes operational, this repository bootstraps the complete platform using GitOps.
+Once Kubernetes becomes operational, this GitOps repository bootstraps the complete platform.
 
 ---
 
-# GitOps Workflow
+# Current GitOps Workflow
 
-```
-Code Change
+```text
+Infrastructure Change
+or
+Application Change
 
-      │
+        │
 
-Git Commit
+Commit
 
-      │
+        │
 
-Private GitLab
+Push to Private GitLab
 
-      │
+        │
 
 Argo CD detects change
 
-      │
+        │
 
-Cluster Sync
+Synchronizes manifests
 
-      │
+        │
 
-Kubernetes Reconciliation
+Kubernetes reconciliation
 
-      │
+        │
 
 Desired State Achieved
 ```
@@ -205,55 +213,64 @@ Desired State Achieved
 
 # Current Features
 
-- High Availability Kubernetes Cluster
-- GitOps Platform using Argo CD
-- App-of-Apps deployment model
-- Self-hosted GitLab CE
-- MetalLB load balancing
-- NGINX Ingress Controller
-- Prometheus monitoring
-- Grafana dashboards
-- Loki centralized logging
-- Certificate automation
-- Secrets management
-- Declarative Kustomize deployments
+* High Availability Kubernetes Cluster
+* GitOps deployment with Argo CD
+* App-of-Apps architecture
+* Self-hosted GitLab CE
+* Kustomize-based deployments
+* MetalLB load balancing
+* NGINX Ingress Controller
+* Longhorn distributed storage
+* Prometheus monitoring
+* Grafana dashboards
+* Loki centralized logging
+* Secrets management
+* Certificate automation
 
 ---
 
 # Roadmap
 
-## Platform
+## CI/CD
 
-- GitLab CI/CD pipeline
-- Helm deployment support
-- Trivy image scanning
-- SBOM generation
-- Policy enforcement
-- Backup automation
+* GitLab CI/CD pipeline
+* Automated container image builds
+* Trivy vulnerability scanning
+* Automated image publishing
 
-## Cloud
+## Kubernetes Platform
 
-- AWS EKS deployment
-- Amazon ECR integration
-- Amazon RDS
-- AWS CloudWatch
-- Hybrid Kubernetes (Homelab + AWS)
-- Multi-cluster Argo CD
+* Helm-based application deployments
+* Enhanced monitoring dashboards
+* Kubernetes autoscaling
+* Gateway API evaluation
 
-## Security
+## Hybrid Cloud (AWS)
 
-- Cilium
-- Network Policies
-- Image Signing
-- Runtime Security
-- Falco
+* Amazon EKS
+* Amazon ECR
+* Amazon RDS
+* Amazon S3
+* AWS CloudWatch
+* Hybrid Kubernetes (Homelab + AWS)
+* Multi-cluster Argo CD
+
+## Applications
+
+* OddsJunction
+
+  * React frontend
+  * API backend
+  * GitLab CI/CD
+  * GitOps deployment
+  * AWS deployment
 
 ---
 
 # Purpose
 
-This project serves as my continuously evolving Platform Engineering laboratory.
+This repository serves as my continuously evolving Platform Engineering laboratory.
 
-Rather than focusing solely on certification objectives, the platform is designed to simulate real-world enterprise environments where infrastructure, continuous delivery, observability, security, and cloud services are managed using modern cloud-native practices.
+Rather than focusing solely on certification objectives, the platform is designed to simulate real-world engineering practices using GitOps, Kubernetes, infrastructure as code, observability, security, and cloud-native technologies.
 
-The long-term objective is to evolve this platform into a hybrid Kubernetes environment spanning both on-premises infrastructure and AWS.
+As the platform evolves, it will expand from an on-premises Kubernetes environment into a hybrid cloud architecture integrating AWS services while maintaining GitOps as the single operational model.
