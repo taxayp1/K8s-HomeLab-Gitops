@@ -18,27 +18,23 @@ The goal of this project is to simulate production Platform Engineering practice
 # Architecture
 
 ```
-                        Developer
-                            │
-                            ▼
-                  Private GitLab CE
-                 (Self-Hosted Source of Truth)
-                            │
-                     Push Mirror
-                            │
-                            ▼
-                  Public GitHub Repository
-                            │
-                            ▼
-                        Argo CD
-                            │
-               Declarative GitOps Sync
-                            │
-                            ▼
-          High Availability Kubernetes Cluster
-         ┌─────────────┬──────────────┐
-         │             │              │
-   Infrastructure    Applications   Monitoring
+                    Developer
+                        │
+                        ▼
+                Private GitLab CE
+          (Internal Source of Truth)
+                │              │
+                │              └──────────────► Public GitHub
+                │                   (Push Mirror for Portfolio)
+                ▼
+              Argo CD
+       (Continuously Pulls from GitLab)
+                │
+                ▼
+ High Availability Kubernetes Cluster
+      ┌──────────┬─────────────┐
+      │          │             │
+Infrastructure Applications Monitoring
 ```
 
 ---
