@@ -21,7 +21,7 @@ spec:
           restartPolicy: Never
           containers:
             - name: oddsjunction-fetch
-              image: gitlab-registry.gitlab.svc.cluster.local:5000/taxayp/oddsjunction:1987155b
+              image: registry.taxayp.com/taxayp/oddsjunction::0075a2b7
               command: ["node", "cronFetch.js"]
               env:
                 - name: DATABASE_URL
