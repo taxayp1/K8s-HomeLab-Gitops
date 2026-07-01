@@ -23,5 +23,5 @@ spec:
                   number: 80
   tls:
      - hosts:
-       - oddsjunction.home.lab
+       - oddsjunction.taxayp.com
        secretName: oddsjunction-tls
