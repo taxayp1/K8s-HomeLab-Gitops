@@ -1,24 +1,3 @@
-# oddsjunction-vault-bridge.yaml
-# Store this in your GitOps infra repo alongside your other vault bridge files.
-# Before ArgoCD syncs this, you must first create the secrets in Vault:
-#
-# vault kv put kv/oddsjunction \
-#   odds-api-key="your_rotated_key" \
-#   betfair-app-key="your_key" \
-#   betfair-username="your_email" \
-#   betfair-password="your_password"
-#
-# The SecretStore reuses your existing vault-backend pattern (same server,
-# same kubernetes auth role as gitlab) - no new Vault policy needed if
-# argocd-role already has read access to kv/* paths. If not, add a policy:
-#
-# vault policy write oddsjunction-policy - <<EOF
-# path "kv/data/oddsjunction" { capabilities = ["read"] }
-# EOF
-# vault write auth/kubernetes/role/argocd-role \
-#   bound_service_account_names=... \
-#   policies=...,oddsjunction-policy  # append, don't replace
-
 apiVersion: external-secrets.io/v1
 kind: SecretStore
 metadata:
@@ -55,18 +34,58 @@ spec:
       remoteRef:
         key: oddsjunction
         property: odds-api-key
-
     - secretKey: BETFAIR_APP_KEY
       remoteRef:
         key: oddsjunction
         property: betfair-app-key
-
     - secretKey: BETFAIR_USERNAME
       remoteRef:
         key: oddsjunction
         property: betfair-username
-
     - secretKey: BETFAIR_PASSWORD
       remoteRef:
         key: oddsjunction
         property: betfair-password
+
+---
+
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: oddsjunction-registry-secret
+  namespace: oddsjunction
+spec:
+  refreshInterval: "1h"
+  secretStoreRef:
+    name: vault-backend
+    kind: SecretStore
+  target:
+    name: gitlab-registry-credentials
+    creationPolicy: Owner
+    # Must be docker-registry type for imagePullSecrets to work
+    template:
+      type: kubernetes.io/dockerconfigjson
+      data:
+        .dockerconfigjson: |
+          {
+            "auths": {
+              "{{ .server }}": {
+                "username": "{{ .username }}",
+                "password": "{{ .password }}",
+                "auth": "{{ printf "%s:%s" .username .password | b64enc }}"
+              }
+            }
+          }
+  data:
+    - secretKey: server
+      remoteRef:
+        key: oddsjunction
+        property: gitlab-registry-server
+    - secretKey: username
+      remoteRef:
+        key: oddsjunction
+        property: gitlab-registry-username
+    - secretKey: password
+      remoteRef:
+        key: oddsjunction
+        property: gitlab-registry-password
