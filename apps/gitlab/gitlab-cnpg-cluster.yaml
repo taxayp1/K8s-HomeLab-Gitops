@@ -3,6 +3,8 @@ kind: Cluster
 metadata:
   name: gitlab-postgres
   namespace: gitlab
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
 spec:
   instances: 2
   imageName: ghcr.io/cloudnative-pg/postgresql:16.3
