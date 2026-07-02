@@ -21,7 +21,7 @@ spec:
         - name: gitlab-registry-credentials
       containers:
         - name: oddsjunction
-          image: registry.taxayp.com/taxayp/oddsjunction:e2b01439
+          image: registry.taxayp.com/taxayp/oddsjunction:af8172c7
           ports:
             - containerPort: 3000
           env:
