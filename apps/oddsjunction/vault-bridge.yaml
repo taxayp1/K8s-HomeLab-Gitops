@@ -34,6 +34,10 @@ spec:
       remoteRef:
         key: oddsjunction
         property: odds-api-key
+        conversionStrategy: Default
+        decodingStrategy: None
+        metadataPolicy: None
+        nullBytePolicy: Ignore
     - secretKey: BETFAIR_APP_KEY
       remoteRef:
         key: oddsjunction
