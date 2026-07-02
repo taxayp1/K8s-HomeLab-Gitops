@@ -5,6 +5,8 @@ metadata:
   namespace: oddsjunction
   labels:
     app: oddsjunction
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
 spec:
   replicas: 1
   selector:
