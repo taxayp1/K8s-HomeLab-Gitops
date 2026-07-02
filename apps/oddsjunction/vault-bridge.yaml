@@ -1,0 +1,91 @@
+apiVersion: external-secrets.io/v1
+kind: SecretStore
+metadata:
+  name: vault-backend
+  namespace: oddsjunction
+spec:
+  provider:
+    vault:
+      server: "http://vault.vault.svc.cluster.local:8200"
+      path: "kv"
+      version: "v2"
+      auth:
+        kubernetes:
+          mountPath: "kubernetes"
+          role: "argocd-role"
+
+---
+
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: oddsjunction-vault-secrets
+  namespace: oddsjunction
+spec:
+  refreshInterval: "1h"
+  secretStoreRef:
+    name: vault-backend
+    kind: SecretStore
+  target:
+    name: oddsjunction-secrets
+    creationPolicy: Owner
+  data:
+    - secretKey: ODDS_API_KEY
+      remoteRef:
+        key: oddsjunction
+        property: odds-api-key
+    - secretKey: BETFAIR_APP_KEY
+      remoteRef:
+        key: oddsjunction
+        property: betfair-app-key
+    - secretKey: BETFAIR_USERNAME
+      remoteRef:
+        key: oddsjunction
+        property: betfair-username
+    - secretKey: BETFAIR_PASSWORD
+      remoteRef:
+        key: oddsjunction
+        property: betfair-password
+
+---
+
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: oddsjunction-registry-secret
+  namespace: oddsjunction
+spec:
+  refreshInterval: "1h"
+  secretStoreRef:
+    name: vault-backend
+    kind: SecretStore
+  target:
+    name: gitlab-registry-credentials
+    creationPolicy: Owner
+    # Must be docker-registry type for imagePullSecrets to work
+    template:
+      type: kubernetes.io/dockerconfigjson
+      data:
+        .dockerconfigjson: |
+          {
+            "auths": {
+              "{{ .server }}": {
+                "username": "{{ .username }}",
+                "password": "{{ .password }}",
+                "auth": "{{ printf "%s:%s" .username .password | b64enc }}"
+              }
+            }
+          }
+  data:
+    - secretKey: server
+      remoteRef:
+        key: oddsjunction
+        property: gitlab-registry-server
+    - secretKey: username
+      remoteRef:
+        key: oddsjunction
+        property: gitlab-registry-username
+    - secretKey: password
+      remoteRef:
+        key: oddsjunction
+        property: gitlab-registry-password

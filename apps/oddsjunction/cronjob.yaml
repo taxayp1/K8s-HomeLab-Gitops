@@ -1,0 +1,41 @@
+
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: oddsjunction-fetch
+  namespace: oddsjunction
+spec:
+  schedule: "0 */12 * * *"
+  startingDeadlineSeconds: 600
+  concurrencyPolicy: Forbid   # never let two fetches overlap and double-write
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 300   # kill a hung fetch after 5 minutes
+      template:
+        spec:
+          restartPolicy: Never
+          imagePullSecrets:
+            - name: gitlab-registry-credentials
+          containers:
+            - name: oddsjunction-fetch
+              image: registry.taxayp.com/taxayp/oddsjunction:611f6eac
+              command: ["node", "cronFetch.js"]
+              env:
+                - name: DATABASE_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: oddsjunction-pg-app
+                      key: uri
+              envFrom:
+                - secretRef:
+                    name: oddsjunction-secrets
+              resources:
+                requests:
+                  cpu: 50m
+                  memory: 128Mi
+                limits:
+                  cpu: 300m
+                  memory: 256Mi
