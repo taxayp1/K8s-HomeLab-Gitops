@@ -57,7 +57,7 @@ spec:
         postgresql:
           install: false
         gitlab-runner:
-          install: false
+          install: true
         gitlab-zoekt:
           install: false
         openbao:
