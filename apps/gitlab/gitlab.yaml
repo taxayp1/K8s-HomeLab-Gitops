@@ -112,6 +112,14 @@ spec:
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: gitlab
+  ignoreDifferences:
+  - group: apps
+    kind: StatefulSet
+    name: gitlab-gitaly
+    namespace: gitlab
+    jsonPointers:
+      - /spec/volumeClaimTemplates/0/apiVersion
+      - /spec/volumeClaimTemplates/0/kind  
   syncPolicy:
     automated:
       prune: true
