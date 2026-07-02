@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'https://gitlab.taxayp.com/taxayp/K8s-HomeLab-Gitops.git'
+    repoURL: 'https://github.com/taxayp1/K8s-HomeLab-Gitops.git'
     targetRevision: HEAD
     path: infrastructure
     directory:
@@ -28,7 +28,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: 'https://gitlab.taxayp.com/taxayp/K8s-HomeLab-Gitops.git'
+    repoURL: 'https://github.com/taxayp1/K8s-HomeLab-Gitops.git'
     targetRevision: HEAD
     path: apps
     directory:
