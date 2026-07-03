@@ -11,7 +11,7 @@ metadata:
 spec:
   ingressClassName: nginx
   rules:
-    - host: oddsjunction.taxayp.com
+    - host: sportsodds.taxayp.com
       http:
         paths:
           - path: /
@@ -23,5 +23,5 @@ spec:
                   number: 80
   tls:
      - hosts:
-       - oddsjunction.taxayp.com
-       secretName: oddsjunction-tls
+       - sportsodds.taxayp.com
+       secretName: sportsodds-tls
