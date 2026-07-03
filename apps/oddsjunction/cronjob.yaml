@@ -21,7 +21,7 @@ spec:
             - name: gitlab-registry-credentials
           containers:
             - name: oddsjunction-fetch
-              image: registry.taxayp.com/taxayp/oddsjunction:5ed7f3e2
+              image: registry.taxayp.com/taxayp/oddsjunction:3790ed6b
               command: ["node", "cronFetch.js"]
               env:
                 - name: DATABASE_URL
