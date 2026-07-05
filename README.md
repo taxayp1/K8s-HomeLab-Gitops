@@ -26,8 +26,8 @@ The long-term objective is to evolve this into a hybrid Platform Engineering lab
 │        │                                                        │
 │        │  git push                                              │
 │        ▼                                                        │
-│   Private GitLab CE ──────────────────► GitHub (Push Mirror)   │
-│   gitlab.taxayp.com   (portfolio)       github.com/taxayp1     │
+│   Private GitLab CE ──────────────────► GitHub (Push Mirror)    │
+│   gitlab.taxayp.com   (portfolio)       github.com/taxayp1      │
 │        │                                                        │
 │        │  CI pipeline triggers                                  │
 │        ▼                                                        │
@@ -38,7 +38,7 @@ The long-term objective is to evolve this into a hybrid Platform Engineering lab
 │        │     Pushes SHA-tagged image to self-hosted registry    │
 │        │     registry.taxayp.com/taxayp/sportsodds:SHA          │
 │        │                                                        │
-│        └── Stage 2: update-manifests                           │
+│        └── Stage 2: update-manifests                            │
 │              Auto-commits new image tag to this GitOps repo     │
 │              (apps/sportsodds/deployment.yaml + cronjob.yaml)   │
 └────────────────────────────┬────────────────────────────────────┘
@@ -49,26 +49,26 @@ The long-term objective is to evolve this into a hybrid Platform Engineering lab
 │              HIGH AVAILABILITY KUBERNETES CLUSTER               │
 │           6 nodes · 3 HP SFF boxes · ~104GB RAM                 │
 │                                                                 │
-│  ┌─────────────┐   ┌─────────────┐   ┌─────────────────────┐  │
-│  │  ArgoCD     │   │  Secrets    │   │  Networking         │  │
-│  │  GitOps     │   │  Vault+ESO  │   │  Cilium+Hubble CNI  │  │
-│  │  reconcile  │   │  injection  │   │  MetalLB+ingress    │  │
-│  └──────┬──────┘   └─────────────┘   └─────────────────────┘  │
+│  ┌─────────────┐   ┌─────────────┐   ┌─────────────────────┐    │
+│  │  ArgoCD     │   │  Secrets    │   │  Networking         │    │
+│  │  GitOps     │   │  Vault+ESO  │   │  Cilium+Hubble CNI  │    │
+│  │  reconcile  │   │  injection  │   │  MetalLB+ingress    │    │
+│  └──────┬──────┘   └─────────────┘   └─────────────────────┘    │
 │         │                                                       │
 │         ▼  deploys                                              │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │                   SportsOdds App                         │  │
-│  │                                                          │  │
-│  │  Deployment (Node.js)  ◄──── CloudNativePG (PostgreSQL)  │  │
-│  │         +                         +                      │  │
-│  │  CronJob (odds fetch)        S3 automated backups        │  │
-│  │  runs every 12 hours                                     │  │
-│  └──────────────────────────┬───────────────────────────────┘  │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │                   SportsOdds App                         │   │
+│  │                                                          │   │
+│  │  Deployment (Node.js)  ◄──── CloudNativePG (PostgreSQL)  │   │
+│  │         +                         +                      │   │
+│  │  CronJob (odds fetch)        S3 automated backups        │   │
+│  │  runs every 12 hours                                     │   │
+│  └──────────────────────────┬───────────────────────────────┘   │
 │                             │                                   │
-│  ┌──────────────────────────────────────────────────────────┐  │
-│  │  Observability: Prometheus · Grafana · Loki · Promtail   │  │
-│  │  Storage: Longhorn distributed block storage             │  │
-│  └──────────────────────────────────────────────────────────┘  │
+│  ┌──────────────────────────────────────────────────────────┐   │
+│  │  Observability: Prometheus · Grafana · Loki · Promtail   │   │
+│  │  Storage: Longhorn distributed block storage             │   │
+│  └──────────────────────────────────────────────────────────┘   │
 └────────────────────────────┬────────────────────────────────────┘
                              │
                              │  Cloudflare Tunnel (outbound only)
