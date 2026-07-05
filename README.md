@@ -2,275 +2,199 @@
 
 ### Automated Kubernetes Infrastructure & Continuous Delivery
 
-> Enterprise-inspired GitOps platform powering a high-availability bare-metal Kubernetes cluster using Argo CD, GitLab CE, Kustomize, and cloud-native technologies.
+> Enterprise-inspired GitOps platform powering a high-availability bare-metal Kubernetes cluster using ArgoCD, self-hosted GitLab CE, Kaniko, CloudNativePG, HashiCorp Vault, and Cloudflare Tunnel — with a full end-to-end CI/CD pipeline deployed to production.
 
 ---
 
-# Overview
+## Overview
 
-This repository serves as the declarative source for Kubernetes platform components and application deployments running on my six-node high-availability homelab Kubernetes cluster.
+This repository is the declarative source of truth for all Kubernetes platform components and application deployments running on a six-node high-availability homelab cluster.
 
-The platform follows GitOps principles where infrastructure and application changes are committed to Git, automatically synchronized by Argo CD, and continuously reconciled against the desired cluster state.
+The platform follows GitOps principles — all infrastructure and application changes are committed to Git, automatically reconciled by ArgoCD, and continuously converged to desired state. A complete CI/CD pipeline takes code from a developer's machine to a running container in the cluster with zero manual steps after the git push.
 
-The long-term objective is to evolve this environment into a hybrid Platform Engineering lab spanning both on-premises infrastructure and AWS.
+The long-term objective is to evolve this into a hybrid Platform Engineering lab spanning on-premises infrastructure and AWS — using the homelab as the data plane and AWS for cloud-native compute workloads.
 
 ---
 
-# Architecture
+## Architecture
 
 ```text
-                    Developer
-                        │
-                        ▼
-                Private GitLab CE
-          (Internal Source of Truth)
-                │              │
-                │              └──────────────► Public GitHub
-                │                   (Push Mirror for Portfolio)
-                ▼
-              Argo CD
-       (Continuously Pulls from GitLab)
-                │
-                ▼
- High Availability Kubernetes Cluster
-      ┌──────────┬─────────────┐
-      │          │             │
-Infrastructure Applications Monitoring
+┌─────────────────────────────────────────────────────────────────┐
+│                     DEVELOPER WORKFLOW                          │
+│                                                                 │
+│   VS Code (Windows)                                             │
+│        │                                                        │
+│        │  git push                                              │
+│        ▼                                                        │
+│   Private GitLab CE ──────────────────► GitHub (Push Mirror)   │
+│   gitlab.taxayp.com   (portfolio)       github.com/taxayp1     │
+│        │                                                        │
+│        │  CI pipeline triggers                                  │
+│        ▼                                                        │
+│   GitLab Runner (Kubernetes executor)                           │
+│        │                                                        │
+│        ├── Stage 1: build-image                                 │
+│        │     Kaniko builds Docker image (rootless, no DinD)     │
+│        │     Pushes SHA-tagged image to self-hosted registry    │
+│        │     registry.taxayp.com/taxayp/sportsodds:SHA          │
+│        │                                                        │
+│        └── Stage 2: update-manifests                           │
+│              Auto-commits new image tag to this GitOps repo     │
+│              (apps/sportsodds/deployment.yaml + cronjob.yaml)   │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                             │  ArgoCD detects manifest change
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│              HIGH AVAILABILITY KUBERNETES CLUSTER               │
+│           6 nodes · 3 HP SFF boxes · ~104GB RAM                 │
+│                                                                 │
+│  ┌─────────────┐   ┌─────────────┐   ┌─────────────────────┐  │
+│  │  ArgoCD     │   │  Secrets    │   │  Networking         │  │
+│  │  GitOps     │   │  Vault+ESO  │   │  Cilium+Hubble CNI  │  │
+│  │  reconcile  │   │  injection  │   │  MetalLB+ingress    │  │
+│  └──────┬──────┘   └─────────────┘   └─────────────────────┘  │
+│         │                                                       │
+│         ▼  deploys                                              │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │                   SportsOdds App                         │  │
+│  │                                                          │  │
+│  │  Deployment (Node.js)  ◄──── CloudNativePG (PostgreSQL)  │  │
+│  │         +                         +                      │  │
+│  │  CronJob (odds fetch)        S3 automated backups        │  │
+│  │  runs every 12 hours                                     │  │
+│  └──────────────────────────┬───────────────────────────────┘  │
+│                             │                                   │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │  Observability: Prometheus · Grafana · Loki · Promtail   │  │
+│  │  Storage: Longhorn distributed block storage             │  │
+│  └──────────────────────────────────────────────────────────┘  │
+└────────────────────────────┬────────────────────────────────────┘
+                             │
+                             │  Cloudflare Tunnel (outbound only)
+                             │  Home IP never exposed · Zero port forward
+                             ▼
+                    ┌─────────────────┐
+                    │  Public Users   │
+                    │  sportsodds     │
+                    │  .taxayp.com    │
+                    └─────────────────┘
 ```
 
 ---
 
-# Platform Overview
+## Private GitOps + Public Portfolio Mirror
 
-Current platform consists of:
-
-* 3 Kubernetes Control Plane nodes
-* 3 Kubernetes Worker nodes
-* High Availability bare-metal Kubernetes cluster
-* GitOps deployment model with Argo CD
-* Kustomize configuration management
-* Self-hosted GitLab CE
-* MetalLB load balancer
-* NGINX Ingress Controller
-* Longhorn distributed storage
-* Prometheus monitoring
-* Grafana dashboards
-* Loki centralized logging
-* HashiCorp Vault
-* External Secrets Operator
-* cert-manager certificate automation
-
----
-
-# Private GitOps Engine & Public Portfolio Mirror
-
-To emulate an enterprise GitOps workflow, the production source of truth is hosted on an internally deployed GitLab CE instance running inside the Kubernetes environment.
-
-Argo CD continuously synchronizes cluster state directly from the internal GitLab repository.
-
-GitLab automatically push-mirrors all commits to this public GitHub repository, allowing the project to remain publicly accessible while preserving an internal-first GitOps workflow.
+Production source of truth lives on the internal self-hosted GitLab CE instance. ArgoCD syncs directly from GitLab. GitLab push-mirrors all commits to this public GitHub repository for portfolio visibility.
 
 ```text
-Developer
-     │
-     ▼
-Private GitLab
-     │
-     ├────────────► Argo CD
-     │               (Pull Model)
-     │
-     └────────────► GitHub
-                 (Push Mirror)
+Developer  →  Private GitLab  →  ArgoCD  →  Cluster
+                    │
+                    └──────────►  GitHub (this repo, push mirror)
 ```
 
 ---
 
-# Repository Structure
+## Repository Structure
 
 ```text
 .
 ├── apps/
-│   ├── gitlab/
-│   ├── nextcloud/
-│   └── whoami/
+│   ├── gitlab/             # Self-hosted GitLab CE (Helm chart, CNPG, Minio)
+│   ├── nextcloud/          # Nextcloud file storage
+│   └── sportsodds/         # Sports odds comparison app (full CI/CD)
+│       ├── namespace.yaml
+│       ├── deployment.yaml
+│       ├── cronjob.yaml
+│       ├── service.yaml
+│       ├── ingress.yaml
+│       ├── cnpg-cluster.yaml
+│       └── vault-bridge.yaml
 │
 ├── clusters/
-│   └── homelab/
-│       ├── argo-apps.yaml
-│       └── kustomization.yaml
+│   └── homelab/            # Root bootstrap — App of Apps
 │
-├── infrastructure/
-│   ├── argocd/
-│   ├── ingress-nginx/
-│   ├── loadbalancer/
-│   ├── logging/
-│   ├── monitoring/
-│   └── security/
-│
-└── kustomization.yaml
+└── infrastructure/
+    ├── argocd/
+    ├── ingress-nginx/
+    ├── loadbalancer/
+    ├── logging/
+    ├── monitoring/
+    └── security/
 ```
 
 ---
 
-# Technology Stack
+## Technology Stack
 
-## Kubernetes Platform
+### Kubernetes Platform
+- Kubernetes (kubeadm) · Kube-VIP (HA control plane)
+- ArgoCD · App of Apps GitOps pattern
+- MetalLB · ingress-nginx
+- Cilium CNI + Hubble (eBPF networking + observability)
+- cert-manager (Cloudflare DNS-01 TLS)
+- Cloudflare Tunnel (zero-trust public exposure)
 
-* Kubernetes
-* Argo CD
-* Kustomize
-* NGINX Ingress Controller
-* MetalLB
+### CI/CD
+- Self-hosted GitLab CE (source, registry, pipelines)
+- GitLab CI + Kaniko (rootless container builds)
+- Automated image tag promotion via GitOps commit-back pattern
+- ArgoCD automated sync + selfHeal
 
-## CI/CD
+### Data & Secrets
+- CloudNativePG (PostgreSQL operator, S3 backups, PITR)
+- HashiCorp Vault (secrets storage)
+- External Secrets Operator (automatic k8s Secret sync)
 
-* GitLab CE
-* GitOps
+### Observability
+- Prometheus + Grafana (metrics + dashboards)
+- Loki + Promtail (log aggregation)
 
-> GitLab CI/CD integration is currently under development.
-
-## Observability
-
-* Prometheus
-* Grafana
-* Loki
-
-## Security
-
-* HashiCorp Vault
-* External Secrets Operator
-* cert-manager
-
-## Storage
-
-* Longhorn
-
-## Infrastructure
-
-* Proxmox VE
-* Terraform
-* Ubuntu Server
+### Storage & Infrastructure
+- Longhorn (distributed block storage)
+- Proxmox VE (hypervisor layer)
+- Terraform (infrastructure as code)
 
 ---
 
-# Infrastructure Dependency
+## Hardware
 
-This repository manages only Kubernetes-native resources.
+| Nodes | Role | RAM |
+|---|---|---|
+| cp-01, cp-02, cp-03 | Control plane | ~8–9 GB allocated each |
+| wk-01, wk-02, wk-03 | Workers | ~21–24 GB allocated each |
 
-The underlying infrastructure is provisioned separately using Terraform.
-
-Infrastructure Repository:
-
-**Proxmox Kubernetes Infrastructure**
-
-https://github.com/taxayp1/Proxmox-Terraform-Infra-For-K8s
-
-That repository provisions:
-
-* Proxmox virtual machines
-* CPU & Memory allocation
-* Static IP addressing
-* Base operating system
-* Kubernetes node infrastructure
-
-Once Kubernetes becomes operational, this GitOps repository bootstraps the complete platform.
+**Physical hosts:** 3 HP EliteDesk SFF boxes · ~104GB aggregate RAM
 
 ---
 
-# Current GitOps Workflow
+## Infrastructure Dependency
 
-```text
-Infrastructure Change
-or
-Application Change
+Underlying VM infrastructure is provisioned separately with Terraform:
 
-        │
+**[Proxmox-Terraform-Infra-For-K8s](https://github.com/taxayp1/Proxmox-Terraform-Infra-For-K8s)**
 
-Commit
-
-        │
-
-Push to Private GitLab
-
-        │
-
-Argo CD detects change
-
-        │
-
-Synchronizes manifests
-
-        │
-
-Kubernetes reconciliation
-
-        │
-
-Desired State Achieved
-```
+Provisions: Proxmox VMs · CPU/RAM allocation · Static IPs · Base OS · Kubernetes node readiness
 
 ---
 
-# Current Features
+## Live Application
 
-* High Availability Kubernetes Cluster
-* GitOps deployment with Argo CD
-* App-of-Apps architecture
-* Self-hosted GitLab CE
-* Kustomize-based deployments
-* MetalLB load balancing
-* NGINX Ingress Controller
-* Longhorn distributed storage
-* Prometheus monitoring
-* Grafana dashboards
-* Loki centralized logging
-* Secrets management
-* Certificate automation
+**[sportsodds.taxayp.com](https://sportsodds.taxayp.com)** — Australian sports betting odds comparison (Cricket, AFL, NRL, Tennis, UFC). The only publicly exposed service — all others are internal only.
 
 ---
 
-# Roadmap
+## Roadmap
 
-## CI/CD
-
-* GitLab CI/CD pipeline
-* Automated container image builds
-* Trivy vulnerability scanning
-* Automated image publishing
-
-## Kubernetes Platform
-
-* Helm-based application deployments
-* Enhanced monitoring dashboards
-* Kubernetes autoscaling
-* Gateway API evaluation
-
-## Hybrid Cloud (AWS)
-
-* Amazon EKS
-* Amazon ECR
-* Amazon RDS
-* Amazon S3
-* AWS CloudWatch
-* Hybrid Kubernetes (Homelab + AWS)
-* Multi-cluster Argo CD
-
-## Applications
-
-* OddsJunction
-
-  * React frontend
-  * API backend
-  * GitLab CI/CD
-  * GitOps deployment
-  * AWS deployment
+- Scraper bot workloads (Playwright-based, per-bookmaker, wave-concurrency)
+- Hybrid cloud: AWS EKS compute → homelab CloudNativePG data plane
+- HA monitoring alerts and PagerDuty/webhook integration
+- Trivy vulnerability scanning in CI pipeline
+- Network policies and zero-trust security hardening
+- Multi-cluster ArgoCD management
 
 ---
 
-# Purpose
+## Purpose
 
-This repository serves as my continuously evolving Platform Engineering laboratory.
-
-Rather than focusing solely on certification objectives, the platform is designed to simulate real-world engineering practices using GitOps, Kubernetes, infrastructure as code, observability, security, and cloud-native technologies.
-
-As the platform evolves, it will expand from an on-premises Kubernetes environment into a hybrid cloud architecture integrating AWS services while maintaining GitOps as the single operational model.
+A continuously evolving Platform Engineering lab built to simulate real-world practices: GitOps, Kubernetes, infrastructure as code, observability, secrets management, and cloud-native delivery. Built alongside CKA, AWS SAA, AWS DVA, and Terraform Associate certifications — with practical implementation going well beyond certification scope.
