@@ -21,7 +21,7 @@ spec:
             - name: gitlab-registry-credentials
           containers:
             - name: sportsodds-fetch
-              image: registry.taxayp.com/taxayp/sportsodds:3790ed6b
+              image: registry.taxayp.com/taxayp/sportsodds:9a2d45dc
               command: ["node", "cronFetch.js"]
               env:
                 - name: DATABASE_URL
