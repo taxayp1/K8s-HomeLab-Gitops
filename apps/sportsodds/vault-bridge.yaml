@@ -2,7 +2,7 @@ apiVersion: external-secrets.io/v1
 kind: SecretStore
 metadata:
   name: vault-backend
-  namespace: oddsjunction
+  namespace: sportsodds
 spec:
   provider:
     vault:
@@ -19,20 +19,20 @@ spec:
 apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
-  name: oddsjunction-vault-secrets
-  namespace: oddsjunction
+  name: sportsodds-vault-secrets
+  namespace: sportsodds
 spec:
   refreshInterval: "1h"
   secretStoreRef:
     name: vault-backend
     kind: SecretStore
   target:
-    name: oddsjunction-secrets
+    name: sportsodds-secrets
     creationPolicy: Owner
   data:
     - secretKey: ODDS_API_KEY
       remoteRef:
-        key: oddsjunction
+        key: sportsodds
         property: odds-api-key
         conversionStrategy: Default
         decodingStrategy: None
@@ -40,7 +40,7 @@ spec:
         nullBytePolicy: Ignore
     - secretKey: BETFAIR_APP_KEY
       remoteRef:
-        key: oddsjunction
+        key: sportsodds
         property: betfair-app-key
         conversionStrategy: Default
         decodingStrategy: None
@@ -48,7 +48,7 @@ spec:
         nullBytePolicy: Ignore
     - secretKey: BETFAIR_USERNAME
       remoteRef:
-        key: oddsjunction
+        key: sportsodds
         property: betfair-username
         conversionStrategy: Default
         decodingStrategy: None
@@ -56,7 +56,7 @@ spec:
         nullBytePolicy: Ignore
     - secretKey: BETFAIR_PASSWORD
       remoteRef:
-        key: oddsjunction
+        key: sportsodds
         property: betfair-password
         conversionStrategy: Default
         decodingStrategy: None
@@ -68,8 +68,8 @@ spec:
 apiVersion: external-secrets.io/v1
 kind: ExternalSecret
 metadata:
-  name: oddsjunction-registry-secret
-  namespace: oddsjunction
+  name: sportsodds-registry-secret
+  namespace: sportsodds
 spec:
   refreshInterval: "1h"
   secretStoreRef:
@@ -94,7 +94,7 @@ spec:
   data:
     - secretKey: server
       remoteRef:
-        key: oddsjunction
+        key: sportsodds
         property: gitlab-registry-server
         conversionStrategy: Default
         decodingStrategy: None
@@ -102,7 +102,7 @@ spec:
         nullBytePolicy: Ignore
     - secretKey: username
       remoteRef:
-        key: oddsjunction
+        key: sportsodds
         property: gitlab-registry-username
         conversionStrategy: Default
         decodingStrategy: None
@@ -110,7 +110,7 @@ spec:
         nullBytePolicy: Ignore
     - secretKey: password
       remoteRef:
-        key: oddsjunction
+        key: sportsodds
         property: gitlab-registry-password
         conversionStrategy: Default
         decodingStrategy: None
