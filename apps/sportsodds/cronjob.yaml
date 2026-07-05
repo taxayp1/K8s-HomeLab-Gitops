@@ -2,36 +2,36 @@
 apiVersion: batch/v1
 kind: CronJob
 metadata:
-  name: oddsjunction-fetch
-  namespace: oddsjunction
+  name: sportsodds-fetch
+  namespace: sportsodds
 spec:
   schedule: "0 */12 * * *"
   startingDeadlineSeconds: 600
-  concurrencyPolicy: Forbid   # never let two fetches overlap and double-write
+  concurrencyPolicy: Forbid 
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3
   jobTemplate:
     spec:
       backoffLimit: 2
-      activeDeadlineSeconds: 300   # kill a hung fetch after 5 minutes
+      activeDeadlineSeconds: 300  
       template:
         spec:
           restartPolicy: Never
           imagePullSecrets:
             - name: gitlab-registry-credentials
           containers:
-            - name: oddsjunction-fetch
-              image: registry.taxayp.com/taxayp/oddsjunction:3790ed6b
+            - name: sportsodds-fetch
+              image: registry.taxayp.com/taxayp/sportsodds:3790ed6b
               command: ["node", "cronFetch.js"]
               env:
                 - name: DATABASE_URL
                   valueFrom:
                     secretKeyRef:
-                      name: oddsjunction-pg-app
+                      name: sportsodds-pg-app
                       key: uri
               envFrom:
                 - secretRef:
-                    name: oddsjunction-secrets
+                    name: sportsodds-secrets
               resources:
                 requests:
                   cpu: 50m

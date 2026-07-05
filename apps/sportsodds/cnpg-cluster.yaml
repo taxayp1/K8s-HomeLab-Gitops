@@ -1,8 +1,8 @@
 apiVersion: postgresql.cnpg.io/v1
 kind: Cluster
 metadata:
-  name: oddsjunction-pg
-  namespace: oddsjunction
+  name: sportsodds-pg
+  namespace: sportsodds
   annotations:
     argocd.argoproj.io/sync-options: Prune=false
 spec:
@@ -16,8 +16,8 @@ spec:
 
   bootstrap:
     initdb:
-      database: oddsjunction
-      owner: oddsjunction_app
+      database: sportsodds
+      owner: sportsodds_app
 
   postgresql:
     parameters:

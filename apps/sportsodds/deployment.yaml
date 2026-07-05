@@ -1,27 +1,27 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: oddsjunction
-  namespace: oddsjunction
+  name: sportsodds
+  namespace: sportsodds
   labels:
-    app: oddsjunction
+    app: sportsodds
   annotations:
     argocd.argoproj.io/sync-options: Prune=false
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: oddsjunction
+      app: sportsodds
   template:
     metadata:
       labels:
-        app: oddsjunction
+        app: sportsodds
     spec:
       imagePullSecrets:
         - name: gitlab-registry-credentials
       containers:
-        - name: oddsjunction
-          image: registry.taxayp.com/taxayp/oddsjunction:3790ed6b
+        - name: sportsodds
+          image: registry.taxayp.com/taxayp/sportsodds:3790ed6b
           ports:
             - containerPort: 3000
           env:
@@ -30,11 +30,11 @@ spec:
             - name: DATABASE_URL
               valueFrom:
                 secretKeyRef:
-                  name: oddsjunction-pg-app
+                  name: sportsodds-pg-app
                   key: uri
           envFrom:
             - secretRef:
-                name: oddsjunction-secrets   # ODDS_API_KEY, Betfair creds - see k8s/secret.example.yaml
+                name: sportsodds-secrets  
           resources:
             requests:
               cpu: 50m

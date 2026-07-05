@@ -1,8 +1,8 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: oddsjunction
-  namespace: oddsjunction
+  name: sportsodds
+  namespace: sportsodds
   annotations:
     cert-manager.io/cluster-issuer: letsencrypt-cloudflare
     nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
@@ -17,7 +17,7 @@ spec:
             pathType: Prefix
             backend:
               service:
-                name: oddsjunction
+                name: sportsodds
                 port:
                   number: 80
   tls:
