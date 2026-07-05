@@ -1,0 +1,33 @@
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: sportsodds-pg
+  namespace: sportsodds
+  annotations:
+    argocd.argoproj.io/sync-options: Prune=false
+spec:
+  instances: 1
+
+  storage:
+    size: 2Gi
+    storageClass: longhorn 
+  monitoring:
+    enablePodMonitor: true
+
+  bootstrap:
+    initdb:
+      database: sportsodds
+      owner: sportsodds_app
+
+  postgresql:
+    parameters:
+      max_connections: "50"
+      shared_buffers: "128MB"
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
