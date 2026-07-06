@@ -15,6 +15,7 @@ metadata:
   name: sportsodds-scraper
   namespace: sportsodds
 spec:
+  suspend: true
   schedule: "0 */2 * * *"        
   concurrencyPolicy: Forbid          # never overlap runs
   startingDeadlineSeconds: 120
