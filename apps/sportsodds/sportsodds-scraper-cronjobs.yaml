@@ -15,7 +15,7 @@ metadata:
   name: sportsodds-scraper
   namespace: sportsodds
 spec:
-  schedule: "*/15 * * * *"           # full 4-sport cycle ~8-15 min; run every 15
+  schedule: "0 */2 * * *"          # full 4-sport cycle ~8-15 min; run every 15
   concurrencyPolicy: Forbid          # never overlap runs
   startingDeadlineSeconds: 120
   successfulJobsHistoryLimit: 2
