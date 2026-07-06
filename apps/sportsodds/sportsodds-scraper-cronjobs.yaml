@@ -1,14 +1,3 @@
-# sportsodds-scraper-cronjob.yaml
-# ─────────────────────────────────────────────────────────────────────────────
-# ONE CronJob runs ALL sports sequentially (afl -> nrl -> cricket -> ufc).
-# Peak concurrency = largest single wave (~6 Chromium). No sport overlap.
-#
-# NO placeholders left. Secrets reuse what already exists in the namespace:
-#   - Betfair creds  -> existing secret "sportsodds-secrets" (from sportsodds-vault-secrets ExternalSecret)
-#   - DB uri         -> existing CNPG secret "sportsodds-pg-app" (key: uri)
-#   - registry pull  -> existing "gitlab-registry-credentials"
-# Nothing new to sync in Vault or ESO. Just apply this file.
-# ─────────────────────────────────────────────────────────────────────────────
 apiVersion: batch/v1
 kind: CronJob
 metadata:
@@ -17,14 +6,14 @@ metadata:
 spec:
   suspend: true
   schedule: "0 */2 * * *"        
-  concurrencyPolicy: Forbid          # never overlap runs
+  concurrencyPolicy: Forbid          
   startingDeadlineSeconds: 120
   successfulJobsHistoryLimit: 2
   failedJobsHistoryLimit: 3
   jobTemplate:
     spec:
-      activeDeadlineSeconds: 1200     # hard kill if a run exceeds 20 min
-      backoffLimit: 0                 # don't retry; next schedule handles it
+      activeDeadlineSeconds: 1200   
+      backoffLimit: 0              
       template:
         spec:
           restartPolicy: Never
@@ -35,14 +24,12 @@ spec:
               image: registry.taxayp.com/taxayp/sportsodds-scraper:latest
               env:
                 - name: SPORTS
-                  value: "afl nrl cricket ufc"    # execution order
-                # DB connection string straight from the CNPG-managed secret
+                  value: "afl nrl cricket ufc"   
                 - name: DATABASE_URL
                   valueFrom:
                     secretKeyRef:
                       name: sportsodds-pg-app
                       key: uri
-                # Betfair creds from the EXISTING app secret (no new ExternalSecret needed)
                 - name: BETFAIR_APP_KEY
                   valueFrom:
                     secretKeyRef:
@@ -60,4 +47,4 @@ spec:
                       key: BETFAIR_PASSWORD
               resources:
                 requests: { cpu: "500m", memory: "1Gi" }
-                limits:   { cpu: "2",    memory: "3Gi" }   # ~6 concurrent Chromium
+                limits:   { cpu: "2",    memory: "3Gi" }   
