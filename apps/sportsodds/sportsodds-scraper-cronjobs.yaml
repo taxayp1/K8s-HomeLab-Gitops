@@ -1,0 +1,62 @@
+# sportsodds-scraper-cronjob.yaml
+# ─────────────────────────────────────────────────────────────────────────────
+# ONE CronJob runs ALL sports sequentially (afl -> nrl -> cricket -> ufc).
+# Peak concurrency = largest single wave (~6 Chromium). No sport overlap.
+#
+# NO placeholders left. Secrets reuse what already exists in the namespace:
+#   - Betfair creds  -> existing secret "sportsodds-secrets" (from sportsodds-vault-secrets ExternalSecret)
+#   - DB uri         -> existing CNPG secret "sportsodds-pg-app" (key: uri)
+#   - registry pull  -> existing "gitlab-registry-credentials"
+# Nothing new to sync in Vault or ESO. Just apply this file.
+# ─────────────────────────────────────────────────────────────────────────────
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: sportsodds-scraper
+  namespace: sportsodds
+spec:
+  schedule: "*/15 * * * *"           # full 4-sport cycle ~8-15 min; run every 15
+  concurrencyPolicy: Forbid          # never overlap runs
+  startingDeadlineSeconds: 120
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      activeDeadlineSeconds: 1200     # hard kill if a run exceeds 20 min
+      backoffLimit: 0                 # don't retry; next schedule handles it
+      template:
+        spec:
+          restartPolicy: Never
+          imagePullSecrets:
+            - name: gitlab-registry-credentials
+          containers:
+            - name: scraper
+              image: registry.taxayp.com/taxayp/sportsodds-scraper:latest
+              env:
+                - name: SPORTS
+                  value: "afl nrl cricket ufc"    # execution order
+                # DB connection string straight from the CNPG-managed secret
+                - name: DATABASE_URL
+                  valueFrom:
+                    secretKeyRef:
+                      name: sportsodds-pg-app
+                      key: uri
+                # Betfair creds from the EXISTING app secret (no new ExternalSecret needed)
+                - name: BETFAIR_APP_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: sportsodds-secrets
+                      key: BETFAIR_APP_KEY
+                - name: BETFAIR_USERNAME
+                  valueFrom:
+                    secretKeyRef:
+                      name: sportsodds-secrets
+                      key: BETFAIR_USERNAME
+                - name: BETFAIR_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: sportsodds-secrets
+                      key: BETFAIR_PASSWORD
+              resources:
+                requests: { cpu: "500m", memory: "1Gi" }
+                limits:   { cpu: "2",    memory: "3Gi" }   # ~6 concurrent Chromium
