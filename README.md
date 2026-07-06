@@ -184,6 +184,14 @@ Provisions: Proxmox VMs · CPU/RAM allocation · Static IPs · Base OS · Kubern
 
 ---
 
+## Related Repositories
+ 
+- **[K8s-HomeLab-Gitops](https://github.com/taxayp1/K8s-HomeLab-Gitops)** — this repo (GitOps manifests)
+- **[SportsOdds app](https://github.com/taxayp1/sportsodds)** — application source code + CI pipeline
+- **[Proxmox-Terraform-Infra-For-K8s](https://github.com/taxayp1/Proxmox-Terraform-Infra-For-K8s)** — Terraform infrastructure layer
+
+---
+
 ## Roadmap
 
 - Scraper bot workloads (Playwright-based, per-bookmaker, wave-concurrency)
