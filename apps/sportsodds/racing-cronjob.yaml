@@ -4,19 +4,15 @@ metadata:
   name: sportsodds-racing
   namespace: sportsodds
 spec:
-  # oddspro refreshes via BetWatch every 5 min - polling faster is wasted calls.
-  schedule: "*/5 * * * *"
+  schedule: "*/5 6-22 * * *"
+  timeZone: "Australia/Brisbane"
   startingDeadlineSeconds: 120
-  # Forbid: a slow run must not overlap the next 5-min tick.
   concurrencyPolicy: Forbid
-  # 288 runs/day - keep history small so completed pods don't pile up.
   successfulJobsHistoryLimit: 3
   failedJobsHistoryLimit: 3
   jobTemplate:
     spec:
       backoffLimit: 2
-      # One /api/meetings pull is quick; cap the run so a hung fetch can't
-      # block the next tick under Forbid. 30s timeout in code + margin.
       activeDeadlineSeconds: 120
       template:
         spec:
@@ -25,9 +21,6 @@ spec:
             - name: gitlab-registry-credentials
           containers:
             - name: sportsodds-racing
-              # IMPORTANT: keep this image tag in sync with the web Deployment.
-              # Same image serves web + all cron jobs; it must contain
-              # racingFetch.js / db-racing.js / racingBookies.js.
               image: registry.taxayp.com/taxayp/sportsodds:1289687b
               command: ["node", "racingFetch.js"]
               env:
