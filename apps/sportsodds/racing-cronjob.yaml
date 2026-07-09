@@ -28,7 +28,7 @@ spec:
               # IMPORTANT: keep this image tag in sync with the web Deployment.
               # Same image serves web + all cron jobs; it must contain
               # racingFetch.js / db-racing.js / racingBookies.js.
-              image: registry.taxayp.com/taxayp/sportsodds:1289687b
+              image: registry.taxayp.com/taxayp/sportsodds:88b1d962
               command: ["node", "racingFetch.js"]
               env:
                 - name: DATABASE_URL
