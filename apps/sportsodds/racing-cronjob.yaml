@@ -21,7 +21,7 @@ spec:
             - name: gitlab-registry-credentials
           containers:
             - name: sportsodds-racing
-              image: registry.taxayp.com/taxayp/sportsodds:d5aa94ce
+              image: registry.taxayp.com/taxayp/sportsodds:72e4f940
               command: ["node", "racingFetch.js"]
               env:
                 - name: DATABASE_URL
