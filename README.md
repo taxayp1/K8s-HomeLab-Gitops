@@ -2,7 +2,7 @@
 
 ### Automated Kubernetes Infrastructure & Continuous Delivery
 
-> Enterprise-inspired GitOps platform powering a high-availability bare-metal Kubernetes cluster using ArgoCD, self-hosted GitLab CE, Kaniko, CloudNativePG, HashiCorp Vault, and Cloudflare Tunnel — with a full end-to-end CI/CD pipeline deployed to production.
+> Enterprise-inspired GitOps platform powering a high-availability bare-metal Kubernetes cluster using ArgoCD, self-hosted GitLab CE, Kaniko, Trivy, CloudNativePG, HashiCorp Vault, and Cloudflare Tunnel — with a full end-to-end CI/CD pipeline (including in-pipeline image security scanning) deployed to production.
 
 ---
 
@@ -10,7 +10,7 @@
 
 This repository is the declarative source of truth for all Kubernetes platform components and application deployments running on a six-node high-availability homelab cluster.
 
-The platform follows GitOps principles — all infrastructure and application changes are committed to Git, automatically reconciled by ArgoCD, and continuously converged to desired state. A complete CI/CD pipeline takes code from a developer's machine to a running container in the cluster with zero manual steps after the git push.
+The platform follows GitOps principles — all infrastructure and application changes are committed to Git, automatically reconciled by ArgoCD, and continuously converged to desired state. A complete CI/CD pipeline takes code from a developer's machine to a running container in the cluster with zero manual steps after the git push, gating deployment on a container vulnerability scan.
 
 The long-term objective is to evolve this into a hybrid Platform Engineering lab spanning on-premises infrastructure and AWS — using the homelab as the data plane and AWS for cloud-native compute workloads.
 
@@ -38,9 +38,13 @@ The long-term objective is to evolve this into a hybrid Platform Engineering lab
 │        │     Pushes SHA-tagged image to self-hosted registry    │
 │        │     registry.taxayp.com/taxayp/sportsodds:SHA          │
 │        │                                                        │
-│        └── Stage 2: update-manifests                            │
+│        ├── Stage 2: security                                    │
+│        │     Trivy scans the image for OS + dependency CVEs     │
+│        │     Fails on fixable CRITICAL — blocks deploy          │
+│        │                                                        │
+│        └── Stage 3: update-manifests                            │
 │              Auto-commits new image tag to this GitOps repo     │
-│              (apps/sportsodds/deployment.yaml + cronjob.yaml)   │
+│              (deployment.yaml + cronjob.yaml + racing-cronjob)  │
 └────────────────────────────┬────────────────────────────────────┘
                              │
                              │  ArgoCD detects manifest change
@@ -61,8 +65,8 @@ The long-term objective is to evolve this into a hybrid Platform Engineering lab
 │  │                                                          │   │
 │  │  Deployment (Node.js)  ◄──── CloudNativePG (PostgreSQL)  │   │
 │  │         +                         +                      │   │
-│  │  CronJob (odds fetch)        S3 automated backups        │   │
-│  │  runs every 12 hours                                     │   │
+│  │  CronJobs (odds fetch +      S3 automated backups        │   │
+│  │  racing fetch every 5 min)                               │   │
 │  └──────────────────────────┬───────────────────────────────┘   │
 │                             │                                   │
 │  ┌──────────────────────────────────────────────────────────┐   │
@@ -106,6 +110,7 @@ Developer  →  Private GitLab  →  ArgoCD  →  Cluster
 │       ├── namespace.yaml
 │       ├── deployment.yaml
 │       ├── cronjob.yaml
+│       ├── racing-cronjob.yaml
 │       ├── service.yaml
 │       ├── ingress.yaml
 │       ├── cnpg-cluster.yaml
@@ -138,6 +143,7 @@ Developer  →  Private GitLab  →  ArgoCD  →  Cluster
 ### CI/CD
 - Self-hosted GitLab CE (source, registry, pipelines)
 - GitLab CI + Kaniko (rootless container builds)
+- Trivy image vulnerability scanning (CVE gate, fails on fixable CRITICAL)
 - Automated image tag promotion via GitOps commit-back pattern
 - ArgoCD automated sync + selfHeal
 
@@ -180,7 +186,7 @@ Provisions: Proxmox VMs · CPU/RAM allocation · Static IPs · Base OS · Kubern
 
 ## Live Application
 
-**[sportsodds.taxayp.com](https://sportsodds.taxayp.com)** — Australian sports betting odds comparison (Cricket, AFL, NRL, Tennis, UFC). The only publicly exposed service — all others are internal only.
+**[sportsodds.taxayp.com](https://sportsodds.taxayp.com)** — Australian sports betting odds comparison (Cricket, AFL, NRL, Tennis, UFC, Racing, and Betfair Exchange). The only publicly exposed service — all others are internal only.
 
 ---
 
@@ -197,7 +203,7 @@ Provisions: Proxmox VMs · CPU/RAM allocation · Static IPs · Base OS · Kubern
 - Scraper bot workloads (Playwright-based, per-bookmaker, wave-concurrency)
 - Hybrid cloud: AWS EKS compute → homelab CloudNativePG data plane
 - HA monitoring alerts and PagerDuty/webhook integration
-- Trivy vulnerability scanning in CI pipeline
+- Additional supply-chain security (secret scanning, SBOM generation, policy gates)
 - Network policies and zero-trust security hardening
 - Multi-cluster ArgoCD management
 
@@ -205,4 +211,4 @@ Provisions: Proxmox VMs · CPU/RAM allocation · Static IPs · Base OS · Kubern
 
 ## Purpose
 
-A continuously evolving Platform Engineering lab built to simulate real-world practices: GitOps, Kubernetes, infrastructure as code, observability, secrets management, and cloud-native delivery. Built alongside CKA, AWS SAA, AWS DVA, and Terraform Associate certifications — with practical implementation going well beyond certification scope.
+A continuously evolving Platform Engineering lab built to simulate real-world practices: GitOps, Kubernetes, infrastructure as code, observability, secrets management, supply-chain security, and cloud-native delivery. Built alongside CKA, AWS SAA, AWS DVA, and Terraform Associate certifications — with practical implementation going well beyond certification scope.
