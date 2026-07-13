@@ -21,7 +21,7 @@ spec:
         - name: gitlab-registry-credentials
       containers:
         - name: sportsodds
-          image: registry.taxayp.com/taxayp/sportsodds:c9781040
+          image: registry.taxayp.com/taxayp/sportsodds:7e6411e4
           ports:
             - containerPort: 3000
           env:
