@@ -105,7 +105,6 @@ Developer  →  Private GitLab  →  ArgoCD  →  Cluster
 .
 ├── apps/
 │   ├── gitlab/             # Self-hosted GitLab CE (Helm chart, CNPG, Minio)
-│   ├── nextcloud/          # Nextcloud file storage
 │   └── sportsodds/         # Sports odds comparison app (full CI/CD)
 │       ├── namespace.yaml
 │       ├── deployment.yaml
