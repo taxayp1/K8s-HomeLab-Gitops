@@ -72,6 +72,36 @@ spec:
                     requests:
                       storage: 10Gi
                   storageClassName: longhorn
+
+        alertmanager:
+          config:
+            global:
+              resolve_timeout: 5m
+              smtp_smarthost: 'smtp.gmail.com:587'
+              smtp_from: 'taxayp1@gmail.com'
+              smtp_auth_username: 'taxayp1@gmail.com'
+              smtp_auth_password_file: '/etc/alertmanager/secrets/alertmanager-smtp-credentials/smtp-password'
+              smtp_require_tls: true
+            route:
+              group_by: ['alertname', 'namespace']
+              group_wait: 30s
+              group_interval: 5m
+              repeat_interval: 4h
+              receiver: 'null'
+              routes:
+                - receiver: 'email-critical'
+                  matchers:
+                    - severity =~ "critical|warning"
+                  continue: false
+            receivers:
+              - name: 'null'
+              - name: 'email-critical'
+                email_configs:
+                  - to: 'taxayp1@gmail.com'
+                    send_resolved: true
+          alertmanagerSpec:
+            secrets:
+              - alertmanager-smtp-credentials
   destination:
     server: https://kubernetes.default.svc
     namespace: monitoring

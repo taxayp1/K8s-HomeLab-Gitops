@@ -36,3 +36,28 @@ spec:
       remoteRef:
         key: "grafana"
         property: "admin-password"
+
+---
+
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
+metadata:
+  name: alertmanager-smtp-sync
+  namespace: monitoring
+spec:
+  refreshInterval: "1m"
+  secretStoreRef:
+    name: vault-backend
+    kind: SecretStore
+  target:
+    name: alertmanager-smtp-credentials
+    creationPolicy: "Owner"
+  data:
+    - secretKey: "smtp-password"
+      remoteRef:
+        key: "alertmanager"
+        property: "smtp-password"
+    - secretKey: "smtp-username"
+      remoteRef:
+        key: "alertmanager"
+        property: "smtp-username"
