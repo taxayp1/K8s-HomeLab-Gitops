@@ -7,3 +7,4 @@ spec:
   schedule: "0 0 2 * * *"
   cluster:
     name: gitlab-postgres
+    retentionPolicy: "7d"
